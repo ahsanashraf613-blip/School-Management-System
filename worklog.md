@@ -79,3 +79,20 @@ Stage Summary:
 - All 33 API assertions pass; browser golden path verified desktop + mobile; lint clean
 - Data now survives reloads and is shared server-side; Settings → Reset reseeds demo data via POST /api/admin/reset
 - Screenshots: scripts/verify-be5-*.png; verification scripts kept for regression use
+
+---
+Task ID: 4
+Agent: Main agent (Z.ai)
+Task: Change school structure to Class 1–10
+
+Work Log:
+- Extended CLASS_LEVELS in src/lib/mock-data.ts from 8 to 10 classes (Class 1 … Class 10)
+- Added HIGH_SCHOOL_SUBJECTS for matric classes 9–10: English, Urdu, Mathematics, Physics, Chemistry, Biology, Islamiat, Pakistan Studies (senior classes 5–8 keep Computer; juniors 1–4 keep core 6)
+- Added 4 science-faculty teachers (Physics, Chemistry, Biology, Pakistan Studies) so every matric subject maps to a real teacher in the timetable; total 16 teachers
+- Fee ladder now Rs 1,800 (Class 1) → Rs 5,400 (Class 10), rooms R-100…R-109
+- Reseeded via POST /api/admin/reset: 10 classes, 16 teachers, 158 students (152 active), 456 challans, 1,824 attendance records, 2,054 marks, 612 timetable slots
+- Lint clean; browser-verified: Classes page shows "10 classes · 152 active students" with all 10 cards; Class 10 timetable renders Physics ×5, Biology ×5, Chemistry ×4, Pakistan Studies ×4 periods/week; dashboard Total Students 152; zero page errors
+- Screenshots: scripts/verify-c10-*.png
+
+Stage Summary:
+- School now spans Class 1–10 with subject-appropriate faculty; all modules (fees, attendance, marks, promote) automatically cover the new classes since they derive from the class list

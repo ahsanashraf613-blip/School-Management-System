@@ -37,9 +37,14 @@ export const SCHOOL_PROFILE: SchoolProfile = {
   principal: "Prof. Anwar Siddiqui",
 };
 
-export const CLASS_LEVELS = ["Class 1", "Class 2", "Class 3", "Class 4", "Class 5", "Class 6", "Class 7", "Class 8"];
+export const CLASS_LEVELS = [
+  "Class 1", "Class 2", "Class 3", "Class 4", "Class 5",
+  "Class 6", "Class 7", "Class 8", "Class 9", "Class 10",
+];
 const CORE_SUBJECTS = ["English", "Urdu", "Mathematics", "Science", "Islamiat", "Social Studies"];
 const SENIOR_SUBJECTS = ["English", "Urdu", "Mathematics", "Science", "Islamiat", "Social Studies", "Computer"];
+// Matric classes (9–10) split Science into lab subjects + Pakistan Studies
+const HIGH_SCHOOL_SUBJECTS = ["English", "Urdu", "Mathematics", "Physics", "Chemistry", "Biology", "Islamiat", "Pakistan Studies"];
 const SECTIONS = ["A", "B"];
 
 // ── Teachers ────────────────────────────────────────────────────────────────
@@ -57,6 +62,11 @@ const TEACHER_SEED: Array<[string, string, string, string, number]> = [
   ["Usman Ghani", "Male", "Science", "M.Sc Chemistry", 66000],
   ["Saima Tariq", "Female", "Urdu", "M.A Urdu", 56000],
   ["Zubair Ahmed", "Male", "Social Studies", "M.A Geography", 59000],
+  // Science faculty for matric classes (9–10)
+  ["Rashid Minhas", "Male", "Physics", "M.Sc Physics", 72000],
+  ["Ayesha Siddiqa", "Female", "Chemistry", "M.Sc Chemistry", 70000],
+  ["Fizzah Nadeem", "Female", "Biology", "M.Sc Botany", 68000],
+  ["Tariq Mehmood", "Male", "Pakistan Studies", "M.A Pakistan Studies", 58000],
 ];
 
 const PHONE_PREFIXES = ["0300", "0301", "0321", "0333", "0345", "0302"];
@@ -85,6 +95,7 @@ export function buildTeachers(): Teacher[] {
 // ── Classes ─────────────────────────────────────────────────────────────────
 export function buildClasses(teachers: Teacher[]): SchoolClass[] {
   return CLASS_LEVELS.map((name, i) => {
+    const matric = i >= 8; // Class 9–10
     const senior = i >= 4;
     return {
       id: `cls-${i + 1}`,
@@ -93,7 +104,7 @@ export function buildClasses(teachers: Teacher[]): SchoolClass[] {
       sections: i % 3 === 2 ? ["A"] : SECTIONS,
       classTeacherId: teachers[i % teachers.length].id,
       monthlyFee: 1800 + i * 400,
-      subjects: senior ? SENIOR_SUBJECTS : CORE_SUBJECTS,
+      subjects: matric ? HIGH_SCHOOL_SUBJECTS : senior ? SENIOR_SUBJECTS : CORE_SUBJECTS,
       roomNo: `R-${100 + i}`,
     };
   });
