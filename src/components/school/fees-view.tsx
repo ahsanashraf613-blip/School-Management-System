@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import {
   BanknoteArrowUp,
   CircleAlert,
+  Download,
   Printer,
   Search,
   Trash2,
@@ -50,18 +51,25 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useSchoolStore } from "@/lib/store";
-import { currentMonth, formatMonth, formatRs, todayISO } from "@/lib/helpers";
+import { challanDue, challanPaid, currentMonth, exportCSV, formatMonth, formatRs, todayISO } from "@/lib/helpers";
 import type { FeeChallan } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 
-const statusVariant = (s: string) =>
-  s === "Paid" ? "default" : s === "Overdue" ? "destructive" : "secondary";
+const statusBadge = (
+  s: string
+): { variant: "default" | "secondary" | "destructive" | "outline"; className?: string } => {
+  if (s === "Paid") return { variant: "default" };
+  if (s === "Overdue") return { variant: "destructive" };
+  if (s === "Partial")
+    return { variant: "outline", className: "border-amber-500/50 bg-amber-500/10 text-amber-600" };
+  return { variant: "secondary" };
+};
 
 export default function FeesView() {
   const challans = useSchoolStore((s) => s.challans);
   const students = useSchoolStore((s) => s.students);
   const classes = useSchoolStore((s) => s.classes);
-  const markChallanPaid = useSchoolStore((s) => s.markChallanPaid);
+  const markChallanPaidRef = useSchoolStore((s) => s.payChallan);
   const deleteChallan = useSchoolStore((s) => s.deleteChallan);
   const generateMonthlyChallans = useSchoolStore((s) => s.generateMonthlyChallans);
   const profile = useSchoolStore((s) => s.profile);
@@ -73,6 +81,8 @@ export default function FeesView() {
   const [printing, setPrinting] = useState<FeeChallan | null>(null);
   const [deleting, setDeleting] = useState<FeeChallan | null>(null);
   const [genMonth, setGenMonth] = useState(currentMonth());
+  const [paying, setPaying] = useState<FeeChallan | null>(null);
+  const [payAmount, setPayAmount] = useState("");
 
   const studentMap = useMemo(() => Object.fromEntries(students.map((s) => [s.id, s])), [students]);
   const classMap = useMemo(() => Object.fromEntries(classes.map((c) => [c.id, c])), [classes]);
@@ -84,12 +94,12 @@ export default function FeesView() {
 
   const stats = useMemo(() => {
     const paid = monthChallans.filter((c) => c.status === "Paid");
-    const pending = monthChallans.filter((c) => c.status === "Pending");
+    const pending = monthChallans.filter((c) => c.status === "Pending" || c.status === "Partial");
     const overdue = monthChallans.filter((c) => c.status === "Overdue");
     return {
-      collected: paid.reduce((a, c) => a + c.total, 0),
-      pending: pending.reduce((a, c) => a + c.total, 0),
-      overdue: overdue.reduce((a, c) => a + c.total, 0),
+      collected: monthChallans.reduce((a, c) => a + challanPaid(c), 0),
+      pending: pending.reduce((a, c) => a + challanDue(c), 0),
+      overdue: overdue.reduce((a, c) => a + challanDue(c), 0),
       paidCount: paid.length,
       pendingCount: pending.length,
       overdueCount: overdue.length,
@@ -129,7 +139,66 @@ export default function FeesView() {
     }
   };
 
-  const printChallan = printing ? studentMap[printing.studentId] : null;
+  const openPayDialog = (c: FeeChallan) => {
+    setPaying(c);
+    setPayAmount(String(challanDue(c)));
+  };
+
+  const confirmPay = () => {
+    if (!paying) return;
+    const due = challanDue(paying);
+    const amount = Math.min(due, Math.max(0, Number(payAmount) || 0));
+    if (amount <= 0) {
+      toast({
+        title: "Invalid amount",
+        description: "Enter an amount greater than zero.",
+        variant: "destructive",
+      });
+      return;
+    }
+    markChallanPaidRef(paying.id, amount);
+    const remaining = due - amount;
+    toast({
+      title: remaining === 0 ? "Payment completed" : "Partial payment received",
+      description:
+        remaining === 0
+          ? `${formatRs(amount)} received against ${paying.challanNo}. Challan fully paid.`
+          : `${formatRs(amount)} received — ${formatRs(remaining)} still outstanding on ${paying.challanNo}.`,
+    });
+    setPaying(null);
+  };
+
+  const handleExport = () => {
+    if (filtered.length === 0) {
+      toast({ title: "Nothing to export", description: "No challans match the current filters." });
+      return;
+    }
+    exportCSV(
+      `fee-challans-${month}.csv`,
+      filtered.map((c) => {
+        const s = studentMap[c.studentId];
+        return {
+          "Challan No": c.challanNo,
+          Student: s?.name ?? "",
+          "Admission No": s?.admissionNo ?? "",
+          Class: s ? `${classMap[s.classId]?.name ?? ""} ${s.section}` : "",
+          Month: c.month,
+          "Tuition Fee": c.tuitionFee,
+          "Other Charges": c.otherCharges,
+          Discount: c.discount,
+          Total: c.total,
+          Paid: challanPaid(c),
+          Balance: challanDue(c),
+          "Due Date": c.dueDate,
+          Status: c.status,
+        };
+      })
+    );
+    toast({ title: "Export started", description: `${filtered.length} challan(s) exported to CSV.` });
+  };
+
+  const payStudent = paying ? studentMap[paying.studentId] : null;
+  const printingStudent = printing ? studentMap[printing.studentId] : null;
 
   return (
     <div className="space-y-4">
@@ -213,10 +282,14 @@ export default function FeesView() {
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="Paid">Paid</SelectItem>
+            <SelectItem value="Partial">Partial</SelectItem>
             <SelectItem value="Pending">Pending</SelectItem>
             <SelectItem value="Overdue">Overdue</SelectItem>
           </SelectContent>
         </Select>
+        <Button variant="outline" onClick={handleExport} className="gap-1.5 whitespace-nowrap">
+          <Download className="h-4 w-4" /> Export
+        </Button>
       </div>
 
       {/* Challan table */}
@@ -264,7 +337,19 @@ export default function FeesView() {
                       <TableCell className="font-semibold tabular-nums">{formatRs(c.total)}</TableCell>
                       <TableCell className="hidden text-xs lg:table-cell">{c.dueDate}</TableCell>
                       <TableCell>
-                        <Badge variant={statusVariant(c.status) as "default" | "secondary" | "destructive"}>{c.status}</Badge>
+                        {(() => {
+                          const b = statusBadge(c.status);
+                          return (
+                            <Badge variant={b.variant} className={b.className}>
+                              {c.status}
+                            </Badge>
+                          );
+                        })()}
+                        {c.status === "Partial" && (
+                          <p className="mt-0.5 text-[10px] text-muted-foreground tabular-nums">
+                            {formatRs(challanPaid(c))} / {formatRs(c.total)}
+                          </p>
+                        )}
                       </TableCell>
                       <TableCell className="pr-5 text-right">
                         <div className="flex justify-end gap-1">
@@ -273,13 +358,7 @@ export default function FeesView() {
                               size="sm"
                               variant="outline"
                               className="h-7 border-emerald-500/40 px-2 text-xs text-emerald-600 hover:bg-emerald-500/10"
-                              onClick={() => {
-                                markChallanPaid(c.id);
-                                toast({
-                                  title: "Payment recorded",
-                                  description: `${formatRs(c.total)} received against ${c.challanNo}.`,
-                                });
-                              }}
+                              onClick={() => openPayDialog(c)}
                             >
                               Receive
                             </Button>
@@ -304,6 +383,73 @@ export default function FeesView() {
         </CardContent>
       </Card>
 
+      {/* Receive payment dialog */}
+      <Dialog open={!!paying} onOpenChange={(o) => !o && setPaying(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Receive Fee Payment</DialogTitle>
+            <DialogDescription>
+              Record a full or partial payment against this challan.
+            </DialogDescription>
+          </DialogHeader>
+          {paying && payStudent && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 rounded-lg border p-3 text-sm">
+                <p className="text-muted-foreground">Student</p>
+                <p className="font-medium">{payStudent.name}</p>
+                <p className="text-muted-foreground">Challan No</p>
+                <p className="font-mono text-xs">{paying.challanNo}</p>
+                <p className="text-muted-foreground">Total Payable</p>
+                <p className="font-semibold tabular-nums">{formatRs(paying.total)}</p>
+                <p className="text-muted-foreground">Already Received</p>
+                <p className="tabular-nums">{formatRs(challanPaid(paying))}</p>
+                <p className="text-muted-foreground">Balance Due</p>
+                <p className="font-semibold tabular-nums text-amber-600">{formatRs(challanDue(paying))}</p>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="pay-amount">Amount Received (Rs)</Label>
+                <Input
+                  id="pay-amount"
+                  type="number"
+                  min={1}
+                  max={challanDue(paying)}
+                  value={payAmount}
+                  onChange={(e) => setPayAmount(e.target.value)}
+                />
+                <div className="flex gap-2 pt-1">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-7"
+                    onClick={() => setPayAmount(String(challanDue(paying)))}
+                  >
+                    Full balance ({formatRs(challanDue(paying))})
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-7"
+                    onClick={() => setPayAmount(String(Math.round(challanDue(paying) / 2)))}
+                  >
+                    Half
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setPaying(null)}>
+              Cancel
+            </Button>
+            <Button onClick={confirmPay} className="bg-emerald-600 text-white hover:bg-emerald-600/90">
+              <BanknoteArrowUp className="h-4 w-4" /> Record Payment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Print / preview dialog */}
       <Dialog open={!!printing} onOpenChange={(o) => !o && setPrinting(null)}>
         <DialogContent className="sm:max-w-md">
@@ -311,8 +457,8 @@ export default function FeesView() {
             <DialogTitle>Fee Challan — Preview</DialogTitle>
             <DialogDescription>Printable bank challan slip.</DialogDescription>
           </DialogHeader>
-          {printing && printChallan && (
-            <div className="rounded-lg border p-4 text-sm">
+          {printing && printingStudent && (
+            <div className="print-area rounded-lg border p-4 text-sm">
               <div className="text-center">
                 <p className="text-base font-bold">{profile.name}</p>
                 <p className="text-[11px] text-muted-foreground">{profile.address}</p>
@@ -325,15 +471,15 @@ export default function FeesView() {
                 <p className="text-muted-foreground">Challan No</p>
                 <p className="font-mono font-medium">{printing.challanNo}</p>
                 <p className="text-muted-foreground">Student</p>
-                <p className="font-medium">{printChallan.name}</p>
+                <p className="font-medium">{printingStudent.name}</p>
                 <p className="text-muted-foreground">Admission No</p>
-                <p className="font-mono">{printChallan.admissionNo}</p>
+                <p className="font-mono">{printingStudent.admissionNo}</p>
                 <p className="text-muted-foreground">Class / Section</p>
                 <p className="font-medium">
-                  {classMap[printChallan.classId]?.name ?? "—"} — {printChallan.section}
+                  {classMap[printingStudent.classId]?.name ?? "—"} — {printingStudent.section}
                 </p>
                 <p className="text-muted-foreground">Father Name</p>
-                <p className="font-medium">{printChallan.fatherName}</p>
+                <p className="font-medium">{printingStudent.fatherName}</p>
               </div>
               <Separator className="my-3" />
               <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
@@ -345,15 +491,24 @@ export default function FeesView() {
                 <p className="text-right tabular-nums">- {formatRs(printing.discount)}</p>
                 <p className="font-semibold">Total Payable</p>
                 <p className="text-right font-bold tabular-nums">{formatRs(printing.total)}</p>
+                <p className="text-muted-foreground">Amount Received</p>
+                <p className="text-right tabular-nums">{formatRs(challanPaid(printing))}</p>
+                <p className="text-muted-foreground">Balance Due</p>
+                <p className="text-right font-semibold tabular-nums text-amber-600">{formatRs(challanDue(printing))}</p>
                 <p className="text-muted-foreground">Due Date</p>
                 <p className="text-right">{printing.dueDate}</p>
               </div>
               <Separator className="my-3" />
               <div className="flex items-center justify-between text-xs">
-                <Badge variant={statusVariant(printing.status) as "default" | "secondary" | "destructive"}>
-                  {printing.status}
-                  {printing.paidDate ? ` on ${printing.paidDate}` : ""}
-                </Badge>
+                {(() => {
+                  const b = statusBadge(printing.status);
+                  return (
+                    <Badge variant={b.variant} className={b.className}>
+                      {printing.status}
+                      {printing.paidDate ? ` on ${printing.paidDate}` : ""}
+                    </Badge>
+                  );
+                })()}
                 <p className="text-muted-foreground">Account #: 0123-4567891-01 (HBL)</p>
               </div>
             </div>

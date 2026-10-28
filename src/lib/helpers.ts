@@ -1,7 +1,40 @@
-import type { ExamMark, Student } from "./types";
+import type { ExamMark, FeeChallan, Student } from "./types";
 
 export function formatRs(amount: number): string {
   return "Rs " + amount.toLocaleString("en-PK");
+}
+
+/** Amount already received against a challan (handles legacy rows without paidAmount). */
+export function challanPaid(c: FeeChallan): number {
+  return c.paidAmount ?? (c.status === "Paid" ? c.total : 0);
+}
+
+/** Remaining balance of a challan. */
+export function challanDue(c: FeeChallan): number {
+  return Math.max(0, c.total - challanPaid(c));
+}
+
+/**
+ * Download an array of records as a CSV file (RFC 4180-style escaping).
+ * Column headers are taken from the keys of the first record.
+ */
+export function exportCSV(filename: string, rows: Array<Record<string, string | number>>): void {
+  if (rows.length === 0) return;
+  const headers = Object.keys(rows[0]);
+  const escape = (v: string | number) => {
+    const s = String(v);
+    return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  const lines = [headers.join(","), ...rows.map((r) => headers.map((h) => escape(r[h])).join(","))];
+  const blob = new Blob(["\uFEFF" + lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 export function formatDate(iso: string): string {

@@ -57,7 +57,7 @@ export interface AttendanceRecord {
   status: AttendanceStatus;
 }
 
-export type FeeStatus = "Paid" | "Pending" | "Overdue";
+export type FeeStatus = "Paid" | "Partial" | "Pending" | "Overdue";
 
 export interface FeeChallan {
   id: string;
@@ -71,6 +71,7 @@ export interface FeeChallan {
   dueDate: string;
   status: FeeStatus;
   paidDate?: string;
+  paidAmount?: number; // amount received so far (partial payments)
 }
 
 export type ExamStatus = "Upcoming" | "Ongoing" | "Completed";

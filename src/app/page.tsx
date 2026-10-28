@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import {
   BookOpenCheck,
   CalendarDays,
@@ -11,6 +11,7 @@ import {
   Moon,
   ReceiptText,
   School,
+  Search,
   Settings,
   Sun,
   Users,
@@ -22,6 +23,15 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { useSchoolStore } from "@/lib/store";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -65,6 +75,31 @@ const VIEW_TITLES: Record<ViewKey, string> = {
   expenses: "Expenses",
   settings: "Settings",
 };
+
+const THEME_KEY = "skoolypro-theme";
+const THEME_EVENT = "skoolypro-theme-change";
+
+// Theme persisted in localStorage, exposed as an external store (lint-safe).
+const subscribeTheme = (cb: () => void) => {
+  window.addEventListener(THEME_EVENT, cb);
+  return () => window.removeEventListener(THEME_EVENT, cb);
+};
+const getThemeSnapshot = () => {
+  try {
+    return localStorage.getItem(THEME_KEY) === "dark";
+  } catch {
+    return false;
+  }
+};
+const getServerThemeSnapshot = () => false;
+
+const VIEW_KEYS = new Set<string>(NAV.map((n) => n.key));
+
+function viewFromHash(): ViewKey {
+  if (typeof window === "undefined") return "dashboard";
+  const h = window.location.hash.replace(/^#\/?/, "");
+  return VIEW_KEYS.has(h) ? (h as ViewKey) : "dashboard";
+}
 
 function NavList({ active, onSelect }: { active: ViewKey; onSelect: (v: ViewKey) => void }) {
   const students = useSchoolStore((s) => s.students);
@@ -132,22 +167,173 @@ function Brand() {
   );
 }
 
+function CommandPalette({
+  open,
+  onOpenChange,
+  onNavigate,
+}: {
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+  onNavigate: (v: ViewKey) => void;
+}) {
+  const students = useSchoolStore((s) => s.students);
+  const teachers = useSchoolStore((s) => s.teachers);
+  const [query, setQuery] = useState("");
+
+  const q = query.trim().toLowerCase();
+  const studentHits = useMemo(() => {
+    if (q.length < 2) return [];
+    return students
+      .filter(
+        (s) =>
+          s.name.toLowerCase().includes(q) ||
+          s.admissionNo.toLowerCase().includes(q) ||
+          s.fatherName.toLowerCase().includes(q)
+      )
+      .slice(0, 6);
+  }, [students, q]);
+
+  const teacherHits = useMemo(() => {
+    if (q.length < 2) return [];
+    return teachers
+      .filter(
+        (t) =>
+          t.name.toLowerCase().includes(q) ||
+          t.subject.toLowerCase().includes(q) ||
+          t.employeeNo.toLowerCase().includes(q)
+      )
+      .slice(0, 4);
+  }, [teachers, q]);
+
+  return (
+    <CommandDialog
+      open={open}
+      onOpenChange={(o) => {
+        onOpenChange(o);
+        if (!o) setQuery("");
+      }}
+      description="Search modules, students and teachers"
+    >
+      <CommandInput value={query} onValueChange={setQuery} placeholder="Search modules, students, teachers…" />
+      <CommandList className="custom-scrollbar">
+        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandGroup heading="Modules">
+          {NAV.map((item) => {
+            const Icon = item.icon;
+            return (
+              <CommandItem
+                key={item.key}
+                value={`module ${item.label}`}
+                onSelect={() => {
+                  onNavigate(item.key);
+                  onOpenChange(false);
+                }}
+              >
+                <Icon className="mr-2 h-4 w-4 text-muted-foreground" aria-hidden />
+                <span>{item.label}</span>
+                <span className="ml-auto text-xs text-muted-foreground">Go to</span>
+              </CommandItem>
+            );
+          })}
+        </CommandGroup>
+        {studentHits.length > 0 && (
+          <>
+            <CommandSeparator />
+            <CommandGroup heading="Students">
+              {studentHits.map((s) => (
+                <CommandItem
+                  key={s.id}
+                  value={`student ${s.name} ${s.admissionNo}`}
+                  onSelect={() => {
+                    onNavigate("students");
+                    onOpenChange(false);
+                  }}
+                >
+                  <Users className="mr-2 h-4 w-4 text-muted-foreground" aria-hidden />
+                  <span>{s.name}</span>
+                  <span className="ml-auto font-mono text-xs text-muted-foreground">{s.admissionNo}</span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </>
+        )}
+        {teacherHits.length > 0 && (
+          <>
+            <CommandSeparator />
+            <CommandGroup heading="Teachers">
+              {teacherHits.map((t) => (
+                <CommandItem
+                  key={t.id}
+                  value={`teacher ${t.name} ${t.employeeNo}`}
+                  onSelect={() => {
+                    onNavigate("teachers");
+                    onOpenChange(false);
+                  }}
+                >
+                  <UsersRound className="mr-2 h-4 w-4 text-muted-foreground" aria-hidden />
+                  <span>{t.name}</span>
+                  <span className="ml-auto text-xs text-muted-foreground">{t.subject}</span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </>
+        )}
+      </CommandList>
+    </CommandDialog>
+  );
+}
+
 export default function Home() {
   const [view, setView] = useState<ViewKey>("dashboard");
-  const [dark, setDark] = useState(false);
+  const dark = useSyncExternalStore(subscribeTheme, getThemeSnapshot, getServerThemeSnapshot);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
   const isMobile = useIsMobile();
   const profile = useSchoolStore((s) => s.profile);
 
-  const toggleTheme = () => {
-    setDark((d) => {
-      document.documentElement.classList.toggle("dark", !d);
-      return !d;
-    });
-  };
+  // Keep <html> class in sync with the persisted theme.
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", dark);
+  }, [dark]);
+
+  const toggleTheme = useCallback(() => {
+    const next = !getThemeSnapshot();
+    try {
+      localStorage.setItem(THEME_KEY, next ? "dark" : "light");
+    } catch {
+      /* storage unavailable */
+    }
+    window.dispatchEvent(new Event(THEME_EVENT));
+  }, []);
+
+  const navigate = useCallback((v: ViewKey) => {
+    setView(v);
+    if (typeof window !== "undefined" && window.location.hash !== `#/${v}`) {
+      window.location.hash = `/${v}`;
+    }
+  }, []);
+
+  // Deep links + browser back/forward support.
+  useEffect(() => {
+    const onHashChange = () => setView(viewFromHash());
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
+
+  // ⌘K / Ctrl+K opens the command palette.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPaletteOpen((o) => !o);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   const selectAndClose = (v: ViewKey) => {
-    setView(v);
+    navigate(v);
     setMobileOpen(false);
   };
 
@@ -170,6 +356,9 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen bg-background">
+      {/* Global search palette */}
+      <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} onNavigate={navigate} />
+
       {/* Desktop sidebar */}
       {!isMobile && (
         <aside className="fixed inset-y-0 left-0 z-40 w-64 border-r border-sidebar-border">
@@ -215,7 +404,20 @@ export default function Home() {
                 })}
               </p>
             </div>
-            <Badge variant="outline" className="hidden gap-1.5 border-primary/30 bg-primary/5 text-primary md:inline-flex">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPaletteOpen(true)}
+              aria-label="Open search"
+              className="gap-2 text-muted-foreground md:w-56 md:justify-start"
+            >
+              <Search className="h-4 w-4" aria-hidden />
+              <span className="hidden md:inline">Search anything…</span>
+              <kbd className="pointer-events-none hidden rounded border bg-muted px-1.5 font-mono text-[10px] font-semibold md:inline-block">
+                ⌘K
+              </kbd>
+            </Button>
+            <Badge variant="outline" className="hidden gap-1.5 border-primary/30 bg-primary/5 text-primary lg:inline-flex">
               <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden />
               {profile.session} Session
             </Badge>
@@ -241,7 +443,7 @@ export default function Home() {
 
         {/* View content */}
         <main className="flex-1 p-4 sm:p-6">
-          {view === "dashboard" && <DashboardView onNavigate={setView} />}
+          {view === "dashboard" && <DashboardView onNavigate={navigate} />}
           {view === "students" && <StudentsView />}
           {view === "teachers" && <TeachersView />}
           {view === "classes" && <ClassesView />}

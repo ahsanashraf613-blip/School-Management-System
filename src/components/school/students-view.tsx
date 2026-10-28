@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Eye, Pencil, Plus, Search, Trash2, UserPlus, Users } from "lucide-react";
+import { ArrowRight, Download, Eye, GraduationCap, Pencil, Plus, Search, Trash2, UserPlus, Users } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -46,9 +46,11 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Separator } from "@/components/ui/separator";
 import { useSchoolStore } from "@/lib/store";
-import { avatarColor, formatRs, initials } from "@/lib/helpers";
+import { avatarColor, exportCSV, formatRs, initials } from "@/lib/helpers";
 import type { Student } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+
+const PAGE_SIZE = 10;
 
 const EMPTY: Omit<Student, "id"> = {
   admissionNo: "",
@@ -76,6 +78,7 @@ export default function StudentsView() {
   const addStudent = useSchoolStore((s) => s.addStudent);
   const updateStudent = useSchoolStore((s) => s.updateStudent);
   const deleteStudent = useSchoolStore((s) => s.deleteStudent);
+  const promoteStudents = useSchoolStore((s) => s.promoteStudents);
   const { toast } = useToast();
 
   const [query, setQuery] = useState("");
@@ -86,6 +89,10 @@ export default function StudentsView() {
   const [form, setForm] = useState<Omit<Student, "id">>(EMPTY);
   const [detail, setDetail] = useState<Student | null>(null);
   const [deleting, setDeleting] = useState<Student | null>(null);
+  const [page, setPage] = useState(0);
+  const [promoteOpen, setPromoteOpen] = useState(false);
+  const [promoFrom, setPromoFrom] = useState("");
+  const [promoTo, setPromoTo] = useState("");
 
   const classMap = useMemo(() => Object.fromEntries(classes.map((c) => [c.id, c])), [classes]);
 
@@ -104,6 +111,58 @@ export default function StudentsView() {
       })
       .sort((a, b) => a.admissionNo.localeCompare(b.admissionNo));
   }, [students, query, classFilter, statusFilter]);
+
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount - 1);
+  const pageRows = useMemo(
+    () => filtered.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE),
+    [filtered, safePage]
+  );
+
+  const promoCandidates = useMemo(
+    () => students.filter((s) => s.classId === promoFrom && s.status === "Active").length,
+    [students, promoFrom]
+  );
+
+  const handleExport = () => {
+    if (filtered.length === 0) {
+      toast({ title: "Nothing to export", description: "No students match the current filters." });
+      return;
+    }
+    exportCSV(
+      `students-${new Date().toISOString().slice(0, 10)}.csv`,
+      filtered.map((s) => ({
+        "Admission No": s.admissionNo,
+        Name: s.name,
+        "Father Name": s.fatherName,
+        Gender: s.gender,
+        Class: classMap[s.classId]?.name ?? "",
+        Section: s.section,
+        "Roll No": s.rollNo,
+        DOB: s.dob,
+        "Blood Group": s.bloodGroup,
+        Phone: s.phone,
+        "Monthly Fee": s.monthlyFee,
+        Status: s.status,
+      }))
+    );
+    toast({ title: "Export started", description: `${filtered.length} student record(s) exported to CSV.` });
+  };
+
+  const handlePromote = () => {
+    if (!promoFrom || !promoTo || promoFrom === promoTo) return;
+    const moved = promoteStudents(promoFrom, promoTo);
+    toast({
+      title: moved > 0 ? "Students promoted" : "Nothing to promote",
+      description:
+        moved > 0
+          ? `${moved} active student(s) moved to ${classMap[promoTo]?.name ?? "the selected class"}.`
+          : "No active students found in the source class.",
+    });
+    setPromoteOpen(false);
+    setPromoFrom("");
+    setPromoTo("");
+  };
 
   const openAdd = () => {
     const nextNo = `ADM-2026-${String(students.length + 1).padStart(3, "0")}`;
@@ -186,6 +245,12 @@ export default function StudentsView() {
           <Button onClick={openAdd} className="gap-1.5 whitespace-nowrap">
             <UserPlus className="h-4 w-4" /> New Admission
           </Button>
+          <Button variant="outline" onClick={() => setPromoteOpen(true)} className="gap-1.5 whitespace-nowrap">
+            <GraduationCap className="h-4 w-4" /> Promote
+          </Button>
+          <Button variant="outline" onClick={handleExport} className="gap-1.5 whitespace-nowrap">
+            <Download className="h-4 w-4" /> Export
+          </Button>
         </div>
       </div>
 
@@ -216,7 +281,7 @@ export default function StudentsView() {
                     </TableCell>
                   </TableRow>
                 )}
-                {filtered.map((s) => (
+                {pageRows.map((s) => (
                   <TableRow key={s.id} className="hover:bg-accent/40">
                     <TableCell className="pl-5">
                       <div className="flex items-center gap-3">
@@ -261,8 +326,36 @@ export default function StudentsView() {
               </TableBody>
             </Table>
           </div>
-          <div className="border-t px-5 py-3 text-xs text-muted-foreground">
-            Showing {filtered.length} of {students.length} students
+          <div className="flex flex-col items-center justify-between gap-2 border-t px-5 py-3 text-xs text-muted-foreground sm:flex-row">
+            <span>
+              Showing {filtered.length === 0 ? 0 : safePage * PAGE_SIZE + 1}–
+              {Math.min(filtered.length, (safePage + 1) * PAGE_SIZE)} of {filtered.length} students
+            </span>
+            {pageCount > 1 && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7"
+                  disabled={safePage === 0}
+                  onClick={() => setPage(safePage - 1)}
+                >
+                  Previous
+                </Button>
+                <span className="tabular-nums">
+                  Page {safePage + 1} / {pageCount}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7"
+                  disabled={safePage >= pageCount - 1}
+                  onClick={() => setPage(safePage + 1)}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -408,6 +501,74 @@ export default function StudentsView() {
         </DialogContent>
       </Dialog>
 
+      {/* Promote students dialog */}
+      <Dialog open={promoteOpen} onOpenChange={setPromoteOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <GraduationCap className="h-5 w-5 text-primary" aria-hidden /> Promote Students
+            </DialogTitle>
+            <DialogDescription>
+              Move all active students of a class to the next class at the end of the session.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label>Promote From</Label>
+              <Select value={promoFrom} onValueChange={(v) => setPromoFrom(v)}>
+                <SelectTrigger aria-label="Promote from class">
+                  <SelectValue placeholder="Select source class" />
+                </SelectTrigger>
+                <SelectContent>
+                  {classes.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center justify-center">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <ArrowRight className="h-4 w-4" aria-hidden />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Promote To</Label>
+              <Select value={promoTo} onValueChange={(v) => setPromoTo(v)}>
+                <SelectTrigger aria-label="Promote to class">
+                  <SelectValue placeholder="Select target class" />
+                </SelectTrigger>
+                <SelectContent>
+                  {classes
+                    .filter((c) => c.id !== promoFrom)
+                    .map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {promoFrom && promoTo && (
+              <div className="rounded-lg border bg-accent/40 px-3 py-2 text-sm">
+                <span className="font-semibold tabular-nums">{promoCandidates}</span> active student(s) will be
+                moved to <span className="font-semibold">{classMap[promoTo]?.name}</span>. Sections and roll
+                numbers are kept as-is.
+              </div>
+            )}
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setPromoteOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handlePromote} disabled={!promoFrom || !promoTo || promoFrom === promoTo}>
+              Promote {promoCandidates > 0 ? `(${promoCandidates})` : ""}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Delete confirm */}
       <AlertDialog open={!!deleting} onOpenChange={(o) => !o && setDeleting(null)}>
         <AlertDialogContent>
@@ -421,7 +582,7 @@ export default function StudentsView() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-white hover:bg-destructive/90">
-              <Plus className="hidden" /> Delete
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

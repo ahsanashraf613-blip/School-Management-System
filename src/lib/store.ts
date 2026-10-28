@@ -49,9 +49,11 @@ interface SchoolState {
   saveAttendance: (records: AttendanceRecord[]) => void;
   // fees
   addChallan: (c: Omit<FeeChallan, "id">) => void;
-  markChallanPaid: (id: string) => void;
+  payChallan: (id: string, amount: number) => void;
   deleteChallan: (id: string) => void;
   generateMonthlyChallans: (month: string) => number;
+  // students (bulk)
+  promoteStudents: (fromClassId: string, toClassId: string) => number;
   // exams
   addExam: (e: Omit<Exam, "id">) => void;
   updateExam: (id: string, patch: Partial<Exam>) => void;
@@ -96,6 +98,20 @@ export const useSchoolStore = create<SchoolState>()(
             ...st.students,
           ],
         })),
+      promoteStudents: (fromClassId, toClassId) => {
+        if (fromClassId === toClassId) return 0;
+        let moved = 0;
+        set((st) => ({
+          students: st.students.map((s) => {
+            if (s.classId === fromClassId && s.status === "Active") {
+              moved++;
+              return { ...s, classId: toClassId };
+            }
+            return s;
+          }),
+        }));
+        return moved;
+      },
       updateStudent: (id, patch) =>
         set((st) => ({ students: st.students.map((s) => (s.id === id ? { ...s, ...patch } : s)) })),
       deleteStudent: (id) =>
@@ -133,11 +149,20 @@ export const useSchoolStore = create<SchoolState>()(
         }),
 
       addChallan: (c) => set((st) => ({ challans: [{ ...c, id: nextId("chl") }, ...st.challans] })),
-      markChallanPaid: (id) =>
+      payChallan: (id, amount) =>
         set((st) => ({
-          challans: st.challans.map((c) =>
-            c.id === id ? { ...c, status: "Paid" as const, paidDate: new Date().toISOString().slice(0, 10) } : c
-          ),
+          challans: st.challans.map((c) => {
+            if (c.id !== id) return c;
+            const already = c.paidAmount ?? (c.status === "Paid" ? c.total : 0);
+            const paid = Math.min(c.total, already + Math.max(0, amount));
+            const fullyPaid = paid >= c.total;
+            return {
+              ...c,
+              paidAmount: paid,
+              status: (fullyPaid ? "Paid" : "Partial") as FeeChallan["status"],
+              paidDate: fullyPaid ? new Date().toISOString().slice(0, 10) : c.paidDate,
+            };
+          }),
         })),
       deleteChallan: (id) => set((st) => ({ challans: st.challans.filter((c) => c.id !== id) })),
       generateMonthlyChallans: (month) => {

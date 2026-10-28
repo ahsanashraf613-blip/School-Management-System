@@ -34,3 +34,26 @@ Stage Summary:
 - All CRUD works against localStorage-persisted mock data; backend intentionally not created per user request
 - Store reset available in Settings; store name "skoolypro-school-data"
 - Lint clean, no runtime errors, browser-verified interactivity on desktop + mobile
+
+---
+Task ID: 2
+Agent: Main agent (Z.ai)
+Task: Review existing SkoolyPro frontend and implement improvements
+
+Work Log:
+- Audited all views; identified 9 improvements (1 bug, UX gaps, eSkooly-parity features)
+- Fixed dark mode not persisting across reloads: replaced useState with useSyncExternalStore on localStorage ("skoolypro-theme") + custom event; React Compiler lint forced the external-store pattern (set-state-in-effect rule)
+- Added hash-based deep links: #/students etc., hashchange listener, browser back/forward works, view survives reload
+- Added ⌘K / Ctrl+K command palette (ui/command CommandDialog) in page.tsx: module navigation + student/teacher search (top 6/4 matches, min 2 chars); "Search anything…" button with ⌘K kbd hint in topbar
+- Fees: replaced binary markChallanPaid with payChallan(id, amount) supporting partial payments; FeeStatus gained "Partial", FeeChallan gained paidAmount?; Receive button opens payment dialog (amount input, Full balance / Half quick buttons); amber Partial badge with "paid / total" subtext; filter dropdown includes Partial; helpers challanPaid()/challanDue() keep legacy data compatible
+- Updated fees stats + dashboard collected/outstanding/fee-trend to use paid/due amounts so partials count correctly
+- Students: client-side pagination (10/page, Showing X–Y of N, Prev/Next), CSV export of filtered list, "Promote Students" dialog (from/to class, live candidate count, moves Active students keeping section/roll)
+- helpers.ts: exportCSV() util (RFC 4180 escaping + BOM) used by students & fees export buttons
+- Added @media print rules: .print-area (fee challan slip) prints alone; slip now also shows Amount Received + Balance Due rows
+- Added missing delete confirmation AlertDialog to Expenses view (was instant delete)
+- Browser-verified via agent-browser: palette search "hira" → 3 hits → navigate, students pagination Page 2/14, promote 18 students Class 1→2 with toast, partial payment Rs 800/2000 → Partial badge + outstanding toast + stats sync, dark mode persists across reload, back button #/fees→#/students, expense delete confirm, dashboard dark renders with consistent figures; fresh reload shows zero console errors
+
+Stage Summary:
+- All 9 improvements shipped and verified; lint clean, tsc clean for src/ (examples/ + skills/ template errors pre-exist)
+- New store API: payChallan(id, amount), promoteStudents(from, to); legacy persisted data compatible (paidAmount optional)
+- Screenshots in /home/z/my-project/scripts/verify-imp-*.png

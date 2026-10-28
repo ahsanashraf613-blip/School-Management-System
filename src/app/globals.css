@@ -136,3 +136,24 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: oklch(0.55 0.13 168 / 0.6);
 }
+
+/* Print: only render the .print-area element (e.g. fee challan slip) */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+  .print-area {
+    position: fixed;
+    inset: 0;
+    margin: 0;
+    width: 100%;
+    max-height: none;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+}

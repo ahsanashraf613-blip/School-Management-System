@@ -40,6 +40,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useSchoolStore } from "@/lib/store";
 import { formatDate, formatRs, todayISO } from "@/lib/helpers";
 import type { Expense } from "@/lib/types";
@@ -79,6 +89,7 @@ export default function ExpensesView() {
   const [catFilter, setCatFilter] = useState("all");
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<Omit<Expense, "id">>(EMPTY);
+  const [deleting, setDeleting] = useState<Expense | null>(null);
 
   const filtered = useMemo(
     () =>
@@ -245,10 +256,7 @@ export default function ExpensesView() {
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8"
-                          onClick={() => {
-                            deleteExpense(e.id);
-                            toast({ title: "Expense deleted", description: `${e.title} was removed.` });
-                          }}
+                          onClick={() => setDeleting(e)}
                           aria-label={`Delete ${e.title}`}
                         >
                           <Trash2 className="h-4 w-4 text-destructive" />
@@ -319,6 +327,34 @@ export default function ExpensesView() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete confirm */}
+      <AlertDialog open={!!deleting} onOpenChange={(o) => !o && setDeleting(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete expense?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleting ? `${deleting.title} (${formatRs(deleting.amount)})` : "This expense"} will be
+              permanently removed. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (deleting) {
+                  deleteExpense(deleting.id);
+                  toast({ title: "Expense deleted", description: `${deleting.title} was removed.` });
+                }
+                setDeleting(null);
+              }}
+              className="bg-destructive text-white hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

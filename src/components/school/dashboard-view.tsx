@@ -28,7 +28,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useSchoolStore } from "@/lib/store";
-import { avatarColor, currentMonth, formatRs, initials, todayISO } from "@/lib/helpers";
+import { avatarColor, challanDue, challanPaid, currentMonth, formatRs, initials, todayISO } from "@/lib/helpers";
 import type { ViewKey } from "@/lib/types";
 
 function StatCard({
@@ -77,8 +77,8 @@ export default function DashboardView({ onNavigate }: { onNavigate: (v: ViewKey)
   const stats = useMemo(() => {
     const active = students.filter((s) => s.status === "Active");
     const monthChallans = challans.filter((c) => c.month === month);
-    const collected = monthChallans.filter((c) => c.status === "Paid").reduce((a, c) => a + c.total, 0);
-    const outstanding = monthChallans.filter((c) => c.status !== "Paid").reduce((a, c) => a + c.total, 0);
+    const collected = monthChallans.reduce((a, c) => a + challanPaid(c), 0);
+    const outstanding = monthChallans.reduce((a, c) => a + challanDue(c), 0);
     const todayRec = attendance.filter((a) => a.date === today);
     const presentToday = todayRec.filter((a) => a.status === "present" || a.status === "late").length;
     const attPct = todayRec.length ? Math.round((presentToday / todayRec.length) * 100) : 0;
@@ -113,8 +113,8 @@ export default function DashboardView({ onNavigate }: { onNavigate: (v: ViewKey)
       const rec = challans.filter((c) => c.month === m);
       return {
         month: new Date(m + "-01T00:00:00").toLocaleDateString("en-GB", { month: "short" }),
-        collected: rec.filter((c) => c.status === "Paid").reduce((a, c) => a + c.total, 0),
-        pending: rec.filter((c) => c.status !== "Paid").reduce((a, c) => a + c.total, 0),
+        collected: rec.reduce((a, c) => a + challanPaid(c), 0),
+        pending: rec.reduce((a, c) => a + challanDue(c), 0),
       };
     });
   }, [challans]);
