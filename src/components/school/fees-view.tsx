@@ -124,8 +124,8 @@ export default function FeesView() {
       .sort((a, b) => a.challanNo.localeCompare(b.challanNo));
   }, [monthChallans, statusFilter, query, studentMap]);
 
-  const handleGenerate = () => {
-    const count = generateMonthlyChallans(genMonth);
+  const handleGenerate = async () => {
+    const count = await generateMonthlyChallans(genMonth);
     if (count === 0) {
       toast({
         title: "Nothing to generate",

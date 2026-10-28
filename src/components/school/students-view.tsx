@@ -149,9 +149,9 @@ export default function StudentsView() {
     toast({ title: "Export started", description: `${filtered.length} student record(s) exported to CSV.` });
   };
 
-  const handlePromote = () => {
+  const handlePromote = async () => {
     if (!promoFrom || !promoTo || promoFrom === promoTo) return;
-    const moved = promoteStudents(promoFrom, promoTo);
+    const moved = await promoteStudents(promoFrom, promoTo);
     toast({
       title: moved > 0 ? "Students promoted" : "Nothing to promote",
       description:

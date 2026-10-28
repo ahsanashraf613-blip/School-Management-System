@@ -1,8 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// SkoolyPro — School Management System schema (SQLite)
 
 generator client {
   provider = "prisma-client-js"
@@ -13,20 +9,157 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model SchoolProfile {
+  id        String @id @default("main")
+  name      String
+  tagline   String @default("")
+  address   String @default("")
+  phone     String @default("")
+  email     String @default("")
+  session   String @default("")
+  principal String @default("")
 }
 
-model Post {
-  id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Teacher {
+  id            String          @id
+  employeeNo    String
+  name          String
+  gender        String
+  subject       String
+  phone         String          @default("")
+  email         String          @default("")
+  qualification String          @default("")
+  joinDate      String          @default("")
+  salary        Float
+  status        String          @default("Active")
+  classes       SchoolClass[]
+  slots         TimetableSlot[]
+}
+
+model SchoolClass {
+  id             String          @id
+  name           String
+  level          Int
+  sectionsJson   String          @default("[\"A\"]")
+  classTeacherId String?
+  monthlyFee     Float           @default(0)
+  subjectsJson   String          @default("[]")
+  roomNo         String          @default("")
+  classTeacher   Teacher?        @relation(fields: [classTeacherId], references: [id], onDelete: SetNull)
+  students       Student[]
+  timetable      TimetableSlot[]
+}
+
+model Student {
+  id            String             @id
+  admissionNo   String
+  name          String
+  fatherName    String
+  gender        String
+  classId       String?
+  section       String             @default("A")
+  rollNo        Int                @default(1)
+  dob           String             @default("")
+  phone         String             @default("")
+  address       String             @default("")
+  admissionDate String             @default("")
+  status        String             @default("Active")
+  bloodGroup    String             @default("")
+  monthlyFee    Float              @default(0)
+  cls           SchoolClass?       @relation(fields: [classId], references: [id], onDelete: SetNull)
+  attendance    AttendanceRecord[]
+  challans      FeeChallan[]
+  marks         ExamMark[]
+}
+
+model AttendanceRecord {
+  id        String  @id @default(cuid())
+  studentId String
+  classId   String
+  date      String
+  status    String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, date])
+  @@index([date])
+  @@index([classId, date])
+}
+
+model FeeChallan {
+  id           String   @id
+  challanNo    String
+  studentId    String
+  month        String
+  tuitionFee   Float
+  otherCharges Float    @default(0)
+  discount     Float    @default(0)
+  total        Float
+  dueDate      String
+  status       String   @default("Pending")
+  paidDate     String?
+  paidAmount   Float?
+  student      Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([month])
+  @@index([studentId])
+}
+
+model Exam {
+  id        String     @id
+  name      String
+  term      String
+  startDate String
+  endDate   String
+  classId   String     @default("all")
+  status    String     @default("Upcoming")
+  marks     ExamMark[]
+}
+
+model ExamMark {
+  id            String  @id
+  examId        String
+  studentId     String
+  subject       String
+  totalMarks    Float
+  obtainedMarks Float   @default(0)
+  exam          Exam    @relation(fields: [examId], references: [id], onDelete: Cascade)
+  student       Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([examId, studentId, subject])
+  @@index([examId])
+}
+
+model TimetableSlot {
+  id        String      @id
+  classId   String
+  section   String
+  day       String
+  period    Int
+  startTime String
+  endTime   String
+  subject   String
+  teacherId String?
+  cls       SchoolClass @relation(fields: [classId], references: [id], onDelete: Cascade)
+  teacher   Teacher?    @relation(fields: [teacherId], references: [id], onDelete: SetNull)
+
+  @@index([classId])
+}
+
+model Notice {
+  id       String @id
+  title    String
+  content  String
+  date     String
+  priority String @default("Normal")
+  audience String @default("All")
+}
+
+model Expense {
+  id            String @id
+  title         String
+  category      String
+  amount        Float
+  date          String
+  paidTo        String @default("")
+  paymentMethod String @default("Cash")
 }

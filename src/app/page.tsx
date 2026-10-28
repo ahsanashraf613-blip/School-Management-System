@@ -5,11 +5,14 @@ import {
   BookOpenCheck,
   CalendarDays,
   ClipboardList,
+  CloudOff,
   GraduationCap,
   LayoutDashboard,
+  Loader2,
   Menu,
   Moon,
   ReceiptText,
+  RefreshCw,
   School,
   Search,
   Settings,
@@ -33,6 +36,7 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 import { useSchoolStore } from "@/lib/store";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { ViewKey } from "@/lib/types";
@@ -283,6 +287,38 @@ function CommandPalette({
   );
 }
 
+function LoadingSplash() {
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background">
+      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg">
+        <GraduationCap className="h-8 w-8" aria-hidden />
+      </div>
+      <div className="text-center">
+        <p className="text-lg font-bold tracking-tight">SkoolyPro</p>
+        <p className="text-sm text-muted-foreground">Loading school data from the server…</p>
+      </div>
+      <Loader2 className="h-5 w-5 animate-spin text-primary" aria-hidden />
+    </div>
+  );
+}
+
+function LoadErrorScreen({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background px-6 text-center">
+      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
+        <CloudOff className="h-8 w-8" aria-hidden />
+      </div>
+      <div>
+        <p className="text-lg font-bold tracking-tight">Could not reach the server</p>
+        <p className="mt-1 max-w-sm text-sm text-muted-foreground">{message}</p>
+      </div>
+      <Button onClick={onRetry} className="gap-2">
+        <RefreshCw className="h-4 w-4" aria-hidden /> Try again
+      </Button>
+    </div>
+  );
+}
+
 export default function Home() {
   const [view, setView] = useState<ViewKey>("dashboard");
   const dark = useSyncExternalStore(subscribeTheme, getThemeSnapshot, getServerThemeSnapshot);
@@ -290,6 +326,29 @@ export default function Home() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const isMobile = useIsMobile();
   const profile = useSchoolStore((s) => s.profile);
+  const loading = useSchoolStore((s) => s.loading);
+  const loaded = useSchoolStore((s) => s.loaded);
+  const loadError = useSchoolStore((s) => s.loadError);
+  const loadAll = useSchoolStore((s) => s.loadAll);
+  const { toast } = useToast();
+
+  // Hydrate the store from the backend API on first mount.
+  useEffect(() => {
+    if (!loaded) void loadAll();
+  }, [loaded, loadAll]);
+
+  // Surface backend mutation failures as toasts.
+  useEffect(() => {
+    const onApiError = (e: Event) => {
+      toast({
+        title: "Server error",
+        description: (e as CustomEvent<string>).detail,
+        variant: "destructive",
+      });
+    };
+    window.addEventListener("skoolypro-api-error", onApiError);
+    return () => window.removeEventListener("skoolypro-api-error", onApiError);
+  }, [toast]);
 
   // Keep <html> class in sync with the persisted theme.
   useEffect(() => {
@@ -313,8 +372,10 @@ export default function Home() {
     }
   }, []);
 
-  // Deep links + browser back/forward support.
+  // Deep links + browser back/forward support. Also restore the view
+  // from the URL hash once on mount (e.g. after a reload of #/fees).
   useEffect(() => {
+    setView(viewFromHash());
     const onHashChange = () => setView(viewFromHash());
     window.addEventListener("hashchange", onHashChange);
     return () => window.removeEventListener("hashchange", onHashChange);
@@ -345,14 +406,24 @@ export default function Home() {
       </div>
       <div className="border-t border-sidebar-border p-4">
         <div className="rounded-lg bg-sidebar-accent/60 p-3">
-          <p className="text-[11px] font-medium text-sidebar-foreground/70">Frontend Demo Mode</p>
+          <p className="flex items-center gap-1.5 text-[11px] font-medium text-sidebar-foreground/70">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
+            Backend Connected
+          </p>
           <p className="mt-1 text-[11px] leading-snug text-sidebar-foreground/50">
-            Data is stored in your browser. Backend API is not connected yet.
+            Data is served by the REST API and stored in the school database.
           </p>
         </div>
       </div>
     </div>
   );
+
+  if (loadError) {
+    return <LoadErrorScreen message={loadError} onRetry={() => void loadAll()} />;
+  }
+  if (!loaded) {
+    return <LoadingSplash />;
+  }
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -458,7 +529,7 @@ export default function Home() {
 
         <footer className="mt-auto border-t px-6 py-4">
           <p className="text-center text-xs text-muted-foreground">
-            SkoolyPro — School Management System · {profile.name} · Frontend preview (mock data, no backend)
+            SkoolyPro — School Management System · {profile.name} · Next.js API routes + Prisma (SQLite)
           </p>
         </footer>
       </div>

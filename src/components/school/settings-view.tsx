@@ -112,22 +112,21 @@ export default function SettingsView() {
               ))}
             </div>
             <p className="text-sm leading-relaxed text-muted-foreground">
-              This build runs entirely on the frontend. All changes are saved to your browser&apos;s local storage — no
-              server or database is involved yet. When the backend is connected later, these mock records will be
-              replaced by real API data.
+              This build is connected to a real backend. Every change is saved through the REST API into the school&apos;s
+              SQLite database (Prisma ORM), so records persist across browsers and devices — not just in this browser.
             </p>
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="outline" className="gap-1.5 border-destructive/40 text-destructive hover:bg-destructive/10">
-                  <RotateCcw className="h-4 w-4" /> Reset Demo Data
+                  <RotateCcw className="h-4 w-4" /> Reset Database
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Reset all demo data?</AlertDialogTitle>
+                  <AlertDialogTitle>Reset the database?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Every change you made (students, fees, attendance, marks…) will be discarded and the original demo
-                    dataset will be restored.
+                    Every change you made (students, fees, attendance, marks…) will be deleted on the server and the
+                    original demo dataset will be re-seeded into the database.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -135,7 +134,7 @@ export default function SettingsView() {
                   <AlertDialogAction
                     onClick={() => {
                       resetAllData();
-                      toast({ title: "Demo data restored", description: "The original seed dataset was reloaded." });
+                      toast({ title: "Database reset", description: "Fresh demo data was re-seeded on the server." });
                     }}
                   >
                     Reset Data
