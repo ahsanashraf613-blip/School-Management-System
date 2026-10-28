@@ -320,7 +320,9 @@ function LoadErrorScreen({ message, onRetry }: { message: string; onRetry: () =>
 }
 
 export default function Home() {
-  const [view, setView] = useState<ViewKey>("dashboard");
+  // Lazy init: restore the view from the URL hash on first render
+  // (e.g. after a reload of #/fees) without a setState-in-effect.
+  const [view, setView] = useState<ViewKey>(() => viewFromHash());
   const dark = useSyncExternalStore(subscribeTheme, getThemeSnapshot, getServerThemeSnapshot);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -372,10 +374,9 @@ export default function Home() {
     }
   }, []);
 
-  // Deep links + browser back/forward support. Also restore the view
-  // from the URL hash once on mount (e.g. after a reload of #/fees).
+  // Deep links + browser back/forward support. The initial view is
+  // restored from the hash via lazy useState initialization above.
   useEffect(() => {
-    setView(viewFromHash());
     const onHashChange = () => setView(viewFromHash());
     window.addEventListener("hashchange", onHashChange);
     return () => window.removeEventListener("hashchange", onHashChange);
