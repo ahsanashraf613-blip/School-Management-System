@@ -1,0 +1,159 @@
+- complementary
+  - image
+  - StaticText "SkoolyPro"
+  - StaticText "Iqra Model School"
+  - navigation
+    - StaticText "OVERVIEW"
+    - link "Dashboard" [ref=e2]
+      - image
+      - StaticText "Dashboard"
+    - StaticText "PEOPLE"
+    - link "Students" [ref=e3]
+      - image
+      - StaticText "Students"
+    - link "Teachers" [ref=e4]
+      - image
+      - StaticText "Teachers"
+    - link "Classes & Sections" [ref=e5]
+      - image
+      - StaticText "Classes & Sections"
+    - StaticText "ACADEMICS"
+    - link "Attendance" [ref=e6]
+      - image
+      - StaticText "Attendance"
+    - link "Exams & Results" [ref=e7]
+      - image
+      - StaticText "Exams & Results"
+    - link "Timetable" [ref=e8]
+      - image
+      - StaticText "Timetable"
+    - StaticText "OPERATIONS"
+    - link "Fee Management" [ref=e9]
+      - image
+      - StaticText "Fee Management"
+    - link "Notice Board" [ref=e10]
+      - image
+      - StaticText "Notice Board"
+    - link "Expenses" [ref=e11]
+      - image
+      - StaticText "Expenses"
+    - StaticText "SYSTEM"
+    - link "Settings" [ref=e12]
+      - image
+      - StaticText "Settings"
+  - generic
+    - StaticText "HTML Edition — static demo"
+    - LineBreak "\n"
+    - StaticText "Data resets on refresh"
+- main
+  - generic
+    - heading "Dashboard" [level=1, ref=e13]
+    - StaticText "School overview"
+    - StaticText "Wed, 28 Oct 2026"
+    - button "Toggle dark mode" [ref=e14]
+      - image
+    - StaticText "IM"
+  - generic
+    - heading "Iqra Model School" [level=2, ref=e19]
+    - paragraph
+      - StaticText "Knowledge · Character · Excellence — 12-A Gulberg III, Lahore, Punjab"
+    - generic
+      - StaticText "Session 2026 – 2027"
+      - StaticText "Principal: Prof. Anwar Siddiqui"
+      - StaticText "10 Classes · 16 Teachers"
+  - generic
+    - image
+    - StaticText "Total Students"
+    - StaticText "146"
+    - generic
+      - StaticText "+12 inactive · 158 on record"
+  - generic
+    - image
+    - StaticText "Teaching Staff"
+    - StaticText "16"
+    - StaticText "1 on leave · fully qualified"
+  - generic
+    - image
+    - StaticText "Fees Collected (Oct)"
+    - StaticText "Rs. 322,400"
+    - generic
+      - StaticText "100% of October target"
+  - generic
+    - image
+    - StaticText "Attendance Today"
+    - StaticText "94%"
+    - StaticText "137 present & late"
+  - StaticText "Attendance Rate — Last 7 Days"
+  - StaticText "Share of present & late students per school day"
+  - image "Attendance trend"
+    - StaticText "80%"
+    - StaticText "85%"
+    - StaticText "90%"
+    - StaticText "95%"
+    - StaticText "100%"
+    - graphics-symbol "Wed: 99%"
+    - graphics-symbol "Thu: 94%"
+    - graphics-symbol "Fri: 97%"
+    - graphics-symbol "Sat: 98%"
+    - graphics-symbol "Mon: 95%"
+    - graphics-symbol "Tue: 98%"
+    - graphics-symbol "Wed: 94%"
+  - StaticText "Wed"
+  - StaticText "Thu"
+  - StaticText "Fri"
+  - StaticText "Sat"
+  - StaticText "Mon"
+  - StaticText "Tue"
+  - StaticText "Wed"
+  - StaticText "Fee Collection by Month"
+  - StaticText "Collected vs outstanding amounts per challan month"
+  - StaticText "May"
+  - StaticText "Jun"
+  - StaticText "Jul"
+  - StaticText "Aug"
+  - StaticText "Sep"
+  - StaticText "Oct"
+  - StaticText "Collected"
+  - StaticText "Outstanding"
+  - StaticText "Latest Notices"
+  - link "View all" [ref=e15]
+  - image
+  - heading "Mid Term Examination Schedule Urgent" [level=4, ref=e16]
+    - StaticText "Mid Term Examination Schedule Urgent"
+  - paragraph
+    - StaticText "Mid Term papers for Class 1 to Class 10 begin on 9 November. The full date sheet has been shared with class te…"
+  - StaticText "24 Oct 2026"
+  - image
+  - heading "Fee Deadline — October Challans Warning" [level=4, ref=e17]
+    - StaticText "Fee Deadline — October Challans Warning"
+  - paragraph
+    - StaticText "October fee challans are due by 31 October. Unpaid challans after the due date will incur a Rs. 200 late fee s…"
+  - StaticText "20 Oct 2026"
+  - image
+  - heading "Parent–Teacher Meeting Event" [level=4, ref=e18]
+    - StaticText "Parent–Teacher Meeting Event"
+  - paragraph
+    - StaticText "PTM for all classes will be held on Saturday, 7 November, 9:00 AM to 1:00 PM. Parents are requested to collect…"
+  - StaticText "18 Oct 2026"
+  - StaticText "Students by Class"
+  - StaticText "Active enrolment across Class 1 – Class 10"
+  - StaticText "Class 1"
+  - StaticText "15"
+  - StaticText "Class 2"
+  - StaticText "15"
+  - StaticText "Class 3"
+  - StaticText "12"
+  - StaticText "Class 4"
+  - StaticText "16"
+  - StaticText "Class 5"
+  - StaticText "15"
+  - StaticText "Class 6"
+  - StaticText "15"
+  - StaticText "Class 7"
+  - StaticText "17"
+  - StaticText "Class 8"
+  - StaticText "14"
+  - StaticText "Class 9"
+  - StaticText "15"
+  - StaticText "Class 10"
+  - StaticText "12"

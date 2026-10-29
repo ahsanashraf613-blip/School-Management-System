@@ -113,3 +113,14 @@ Work Log:
 
 Stage Summary:
 - UI refresh shipped: grouped navigation, notification center, animated transitions, gradient stat cards, hero banner, ranked class strength — all modules, light/dark, desktop/mobile
+
+## Task 5 — Standalone HTML Edition (single file)
+- **Request**: "i want html file" → deliver a real .html file of the school management system
+- **Built**: `download/school-management.html` (~960 lines, zero dependencies, works offline via file://)
+  - Same design language as Next.js app: emerald theme, dark gradient sidebar, hero banner, cards, chips
+  - All 11 modules: Dashboard (hero + 4 stat cards + SVG attendance line chart + fee collection bars + class distribution + latest notices), Students (search/class/status filters, pagination, Admit Student modal), Teachers (16 cards), Classes (10 cards Class 1–10 with matric subjects), Attendance (P/A/L toggle register), Fees (monthly summary cards + challan table + Collect action), Exams (First Term published marks table w/ grades, Mid Term empty state), Timetable (per-class color-coded weekly grid), Notices, Expenses (category bars + budget health), Settings (profile + demo reset)
+  - Deterministic seed (mulberry32 20261028) mirrors src/lib/mock-data.ts: Iqra Model School, 10 classes, 16 teachers, 158 students, 6 months challans, 7-day attendance
+  - Extras: dark mode toggle (localStorage persisted), toasts, responsive sidebar (hamburger <860px), hash routing #/students etc., view-enter animations
+  - Demo-only mutations (in-memory) — clearly labeled "Data resets on refresh"
+- **Verify**: node --check on extracted JS ✓; agent-browser walkthrough (1440x900): dashboard/students/fees/timetable/exams all render, key texts found, dark mode ✓, zero console errors; screenshots scripts/verify-html-*.png
+- **Next.js app untouched** — real app still runs with API + SQLite persistence

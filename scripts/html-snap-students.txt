@@ -1,0 +1,211 @@
+- complementary
+  - image
+  - StaticText "SkoolyPro"
+  - StaticText "Iqra Model School"
+  - navigation
+    - StaticText "OVERVIEW"
+    - link "Dashboard" [ref=e20]
+      - image
+      - StaticText "Dashboard"
+    - StaticText "PEOPLE"
+    - link "Students" [ref=e21]
+      - image
+      - StaticText "Students"
+    - link "Teachers" [ref=e22]
+      - image
+      - StaticText "Teachers"
+    - link "Classes & Sections" [ref=e23]
+      - image
+      - StaticText "Classes & Sections"
+    - StaticText "ACADEMICS"
+    - link "Attendance" [ref=e24]
+      - image
+      - StaticText "Attendance"
+    - link "Exams & Results" [ref=e25]
+      - image
+      - StaticText "Exams & Results"
+    - link "Timetable" [ref=e26]
+      - image
+      - StaticText "Timetable"
+    - StaticText "OPERATIONS"
+    - link "Fee Management" [ref=e27]
+      - image
+      - StaticText "Fee Management"
+    - link "Notice Board" [ref=e28]
+      - image
+      - StaticText "Notice Board"
+    - link "Expenses" [ref=e29]
+      - image
+      - StaticText "Expenses"
+    - StaticText "SYSTEM"
+    - link "Settings" [ref=e30]
+      - image
+      - StaticText "Settings"
+  - generic
+    - StaticText "HTML Edition — static demo"
+    - LineBreak "\n"
+    - StaticText "Data resets on refresh"
+- main
+  - generic
+    - heading "Students" [level=1, ref=e31]
+    - StaticText "Admissions & records"
+    - StaticText "Wed, 28 Oct 2026"
+    - button "Toggle dark mode" [ref=e32]
+      - image
+    - StaticText "IM"
+  - textbox "Search name, father or ID…" [ref=e33]
+  - combobox [expanded=false, ref=e34]: All Classes
+    - MenuListPopup
+      - option "All Classes" [selected, ref=e39]
+      - option "Class 1" [ref=e40]
+      - option "Class 2" [ref=e41]
+      - option "Class 3" [ref=e42]
+      - option "Class 4" [ref=e43]
+      - option "Class 5" [ref=e44]
+      - option "Class 6" [ref=e45]
+      - option "Class 7" [ref=e46]
+      - option "Class 8" [ref=e47]
+      - option "Class 9" [ref=e48]
+      - option "Class 10" [ref=e49]
+  - combobox [expanded=false, ref=e35]: All Statuses
+    - MenuListPopup
+      - option "All Statuses" [selected, ref=e50]
+      - option "Active" [ref=e51]
+      - option "Inactive" [ref=e52]
+  - button "Admit Student" [ref=e36]
+    - image
+    - StaticText "Admit Student"
+  - table
+    - rowgroup
+      - row
+        - columnheader "ID" [ref=e133]
+        - columnheader "STUDENT" [ref=e134]
+        - columnheader "CLASS" [ref=e135]
+        - columnheader "ROLL" [ref=e136]
+        - columnheader "FATHER NAME" [ref=e137]
+        - columnheader "PHONE" [ref=e138]
+        - columnheader "MONTHLY FEE" [ref=e139]
+        - columnheader "STATUS" [ref=e140]
+    - row
+      - cell "std-001" [ref=e53]
+      - cell "ZK Zain Khan Male · B+" [ref=e54]
+        - StaticText "ZK"
+        - StaticText "Zain Khan"
+        - StaticText "Male · B+"
+      - cell "Class 1-B" [ref=e55]
+      - cell "R-01" [ref=e56]
+      - cell "Faizan Khan" [ref=e57]
+      - cell "0345-6898358" [ref=e58]
+      - cell "Rs. 1,800" [ref=e59]
+      - cell "Active" [ref=e60]
+    - row
+      - cell "std-002" [ref=e61]
+      - cell "HI Hafsa Iqbal Female · B-" [ref=e62]
+        - StaticText "HI"
+        - StaticText "Hafsa Iqbal"
+        - StaticText "Female · B-"
+      - cell "Class 1-B" [ref=e63]
+      - cell "R-02" [ref=e64]
+      - cell "Saad Iqbal" [ref=e65]
+      - cell "0345-6785857" [ref=e66]
+      - cell "Rs. 1,800" [ref=e67]
+      - cell "Active" [ref=e68]
+    - row
+      - cell "std-003" [ref=e69]
+      - cell "HN Hamza Nawaz Male · A+" [ref=e70]
+        - StaticText "HN"
+        - StaticText "Hamza Nawaz"
+        - StaticText "Male · A+"
+      - cell "Class 1-A" [ref=e71]
+      - cell "R-01" [ref=e72]
+      - cell "Bilal Nawaz" [ref=e73]
+      - cell "0345-1837078" [ref=e74]
+      - cell "Rs. 1,800" [ref=e75]
+      - cell "Active" [ref=e76]
+    - row
+      - cell "std-004" [ref=e77]
+      - cell "SA Sana Aslam Female · A+" [ref=e78]
+        - StaticText "SA"
+        - StaticText "Sana Aslam"
+        - StaticText "Female · A+"
+      - cell "Class 1-B" [ref=e79]
+      - cell "R-03" [ref=e80]
+      - cell "Faizan Aslam" [ref=e81]
+      - cell "0302-7839445" [ref=e82]
+      - cell "Rs. 1,800" [ref=e83]
+      - cell "Active" [ref=e84]
+    - row
+      - cell "std-005" [ref=e85]
+      - cell "AN Ali Nawaz Male · A-" [ref=e86]
+        - StaticText "AN"
+        - StaticText "Ali Nawaz"
+        - StaticText "Male · A-"
+      - cell "Class 1-A" [ref=e87]
+      - cell "R-02" [ref=e88]
+      - cell "Ahmed Nawaz" [ref=e89]
+      - cell "0321-9647342" [ref=e90]
+      - cell "Rs. 1,800" [ref=e91]
+      - cell "Inactive" [ref=e92]
+    - row
+      - cell "std-006" [ref=e93]
+      - cell "HF Hafsa Farooq Female · A-" [ref=e94]
+        - StaticText "HF"
+        - StaticText "Hafsa Farooq"
+        - StaticText "Female · A-"
+      - cell "Class 1-B" [ref=e95]
+      - cell "R-04" [ref=e96]
+      - cell "Ibrahim Farooq" [ref=e97]
+      - cell "0345-5330500" [ref=e98]
+      - cell "Rs. 1,800" [ref=e99]
+      - cell "Active" [ref=e100]
+    - row
+      - cell "std-007" [ref=e101]
+      - cell "MQ Muhammad Qureshi Male · B-" [ref=e102]
+        - StaticText "MQ"
+        - StaticText "Muhammad Qureshi"
+        - StaticText "Male · B-"
+      - cell "Class 1-A" [ref=e103]
+      - cell "R-03" [ref=e104]
+      - cell "Danish Qureshi" [ref=e105]
+      - cell "0345-7800896" [ref=e106]
+      - cell "Rs. 1,800" [ref=e107]
+      - cell "Active" [ref=e108]
+    - row
+      - cell "std-008" [ref=e109]
+      - cell "RQ Rehan Qureshi Male · B+" [ref=e110]
+        - StaticText "RQ"
+        - StaticText "Rehan Qureshi"
+        - StaticText "Male · B+"
+      - cell "Class 1-A" [ref=e111]
+      - cell "R-04" [ref=e112]
+      - cell "Zain Qureshi" [ref=e113]
+      - cell "0321-7889648" [ref=e114]
+      - cell "Rs. 1,800" [ref=e115]
+      - cell "Active" [ref=e116]
+    - row
+      - cell "std-009" [ref=e117]
+      - cell "UI Usman Iqbal Male · AB+" [ref=e118]
+        - StaticText "UI"
+        - StaticText "Usman Iqbal"
+        - StaticText "Male · AB+"
+      - cell "Class 1-A" [ref=e119]
+      - cell "R-05" [ref=e120]
+      - cell "Zain Iqbal" [ref=e121]
+      - cell "0300-3890761" [ref=e122]
+      - cell "Rs. 1,800" [ref=e123]
+      - cell "Active" [ref=e124]
+    - row
+      - cell "std-010" [ref=e125]
+      - cell "HF Hafsa Farooq Female · O-" [ref=e126]
+        - StaticText "HF"
+        - StaticText "Hafsa Farooq"
+        - StaticText "Female · O-"
+      - cell "Class 1-B" [ref=e127]
+      - cell "R-05" [ref=e128]
+      - cell "Faizan Farooq" [ref=e129]
+      - cell "0345-5598598" [ref=e130]
+      - cell "Rs. 1,800" [ref=e131]
+      - cell "Active" [ref=e132]
+  - StaticText "Showing 1–10 of 158 students"
+  - button "Previous" [disabled, ref=e37]
+  - button "Next" [ref=e38]

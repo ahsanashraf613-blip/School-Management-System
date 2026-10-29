@@ -1,0 +1,233 @@
+- complementary
+  - image
+  - StaticText "SkoolyPro"
+  - StaticText "Iqra Model School"
+  - navigation
+    - StaticText "OVERVIEW"
+    - link "Dashboard" [ref=e141]
+      - image
+      - StaticText "Dashboard"
+    - StaticText "PEOPLE"
+    - link "Students" [ref=e142]
+      - image
+      - StaticText "Students"
+    - link "Teachers" [ref=e143]
+      - image
+      - StaticText "Teachers"
+    - link "Classes & Sections" [ref=e144]
+      - image
+      - StaticText "Classes & Sections"
+    - StaticText "ACADEMICS"
+    - link "Attendance" [ref=e145]
+      - image
+      - StaticText "Attendance"
+    - link "Exams & Results" [ref=e146]
+      - image
+      - StaticText "Exams & Results"
+    - link "Timetable" [ref=e147]
+      - image
+      - StaticText "Timetable"
+    - StaticText "OPERATIONS"
+    - link "Fee Management" [ref=e148]
+      - image
+      - StaticText "Fee Management"
+    - link "Notice Board" [ref=e149]
+      - image
+      - StaticText "Notice Board"
+    - link "Expenses" [ref=e150]
+      - image
+      - StaticText "Expenses"
+    - StaticText "SYSTEM"
+    - link "Settings" [ref=e151]
+      - image
+      - StaticText "Settings"
+  - generic
+    - StaticText "HTML Edition — static demo"
+    - LineBreak "\n"
+    - StaticText "Data resets on refresh"
+- main
+  - generic
+    - heading "Fee Management" [level=1, ref=e152]
+    - StaticText "Challans & collection"
+    - StaticText "Wed, 28 Oct 2026"
+    - button "Toggle dark mode" [ref=e153]
+      - image
+    - StaticText "IM"
+  - generic
+    - StaticText "Collected — Oct 2026"
+    - StaticText "Rs. 322,400"
+    - StaticText "62% of monthly target"
+  - generic
+    - StaticText "Pending"
+    - StaticText "Rs. 115,800"
+    - StaticText "33 challans unpaid"
+  - generic
+    - StaticText "Overdue"
+    - StaticText "Rs. 84,600"
+    - StaticText "23 challans past due date"
+  - combobox [expanded=false, ref=e154]: Oct 2026
+    - MenuListPopup
+      - option "May 2026" [ref=e158]
+      - option "Jun 2026" [ref=e159]
+      - option "Jul 2026" [ref=e160]
+      - option "Aug 2026" [ref=e161]
+      - option "Sep 2026" [ref=e162]
+      - option "Oct 2026" [selected, ref=e163]
+  - combobox [expanded=false, ref=e155]: All Statuses
+    - MenuListPopup
+      - option "All Statuses" [selected, ref=e164]
+      - option "Paid" [ref=e165]
+      - option "Pending" [ref=e166]
+      - option "Overdue" [ref=e167]
+  - StaticText "146 challans"
+  - table
+    - rowgroup
+      - row
+        - columnheader "CHALLAN" [ref=e252]
+        - columnheader "STUDENT" [ref=e253]
+        - columnheader "MONTH" [ref=e254]
+        - columnheader "AMOUNT" [ref=e255]
+        - columnheader "STATUS" [ref=e256]
+        - columnheader "PAID ON" [ref=e257]
+        - columnheader
+    - row
+      - cell "CH-2026-0006" [ref=e168]
+      - cell "ZK Zain Khan Class 1-B" [ref=e169]
+        - StaticText "ZK"
+        - StaticText "Zain Khan"
+        - StaticText "Class 1-B"
+      - cell "Oct 2026" [ref=e170]
+      - cell "Rs. 1,800" [ref=e171]
+      - cell "Paid" [ref=e172]
+      - cell "17 Oct 2026" [ref=e173]
+      - cell "Settled" [ref=e174]
+    - row
+      - cell "CH-2026-0012" [ref=e175]
+      - cell "HI Hafsa Iqbal Class 1-B" [ref=e176]
+        - StaticText "HI"
+        - StaticText "Hafsa Iqbal"
+        - StaticText "Class 1-B"
+      - cell "Oct 2026" [ref=e177]
+      - cell "Rs. 1,800" [ref=e178]
+      - cell "Overdue" [ref=e179]
+      - cell "—" [ref=e180]
+      - cell "Collect" [ref=e181]
+        - button "Collect" [ref=e258]
+    - row
+      - cell "CH-2026-0018" [ref=e182]
+      - cell "HN Hamza Nawaz Class 1-A" [ref=e183]
+        - StaticText "HN"
+        - StaticText "Hamza Nawaz"
+        - StaticText "Class 1-A"
+      - cell "Oct 2026" [ref=e184]
+      - cell "Rs. 1,800" [ref=e185]
+      - cell "Overdue" [ref=e186]
+      - cell "—" [ref=e187]
+      - cell "Collect" [ref=e188]
+        - button "Collect" [ref=e259]
+    - row
+      - cell "CH-2026-0024" [ref=e189]
+      - cell "SA Sana Aslam Class 1-B" [ref=e190]
+        - StaticText "SA"
+        - StaticText "Sana Aslam"
+        - StaticText "Class 1-B"
+      - cell "Oct 2026" [ref=e191]
+      - cell "Rs. 1,800" [ref=e192]
+      - cell "Paid" [ref=e193]
+      - cell "7 Oct 2026" [ref=e194]
+      - cell "Settled" [ref=e195]
+    - row
+      - cell "CH-2026-0030" [ref=e196]
+      - cell "HF Hafsa Farooq Class 1-B" [ref=e197]
+        - StaticText "HF"
+        - StaticText "Hafsa Farooq"
+        - StaticText "Class 1-B"
+      - cell "Oct 2026" [ref=e198]
+      - cell "Rs. 1,800" [ref=e199]
+      - cell "Pending" [ref=e200]
+      - cell "—" [ref=e201]
+      - cell "Collect" [ref=e202]
+        - button "Collect" [ref=e260]
+    - row
+      - cell "CH-2026-0036" [ref=e203]
+      - cell "MQ Muhammad Qureshi Class 1-A" [ref=e204]
+        - StaticText "MQ"
+        - StaticText "Muhammad Qureshi"
+        - StaticText "Class 1-A"
+      - cell "Oct 2026" [ref=e205]
+      - cell "Rs. 1,800" [ref=e206]
+      - cell "Pending" [ref=e207]
+      - cell "—" [ref=e208]
+      - cell "Collect" [ref=e209]
+        - button "Collect" [ref=e261]
+    - row
+      - cell "CH-2026-0042" [ref=e210]
+      - cell "RQ Rehan Qureshi Class 1-A" [ref=e211]
+        - StaticText "RQ"
+        - StaticText "Rehan Qureshi"
+        - StaticText "Class 1-A"
+      - cell "Oct 2026" [ref=e212]
+      - cell "Rs. 1,800" [ref=e213]
+      - cell "Paid" [ref=e214]
+      - cell "2 Oct 2026" [ref=e215]
+      - cell "Settled" [ref=e216]
+    - row
+      - cell "CH-2026-0048" [ref=e217]
+      - cell "UI Usman Iqbal Class 1-A" [ref=e218]
+        - StaticText "UI"
+        - StaticText "Usman Iqbal"
+        - StaticText "Class 1-A"
+      - cell "Oct 2026" [ref=e219]
+      - cell "Rs. 1,800" [ref=e220]
+      - cell "Overdue" [ref=e221]
+      - cell "—" [ref=e222]
+      - cell "Collect" [ref=e223]
+        - button "Collect" [ref=e262]
+    - row
+      - cell "CH-2026-0054" [ref=e224]
+      - cell "HF Hafsa Farooq Class 1-B" [ref=e225]
+        - StaticText "HF"
+        - StaticText "Hafsa Farooq"
+        - StaticText "Class 1-B"
+      - cell "Oct 2026" [ref=e226]
+      - cell "Rs. 1,800" [ref=e227]
+      - cell "Paid" [ref=e228]
+      - cell "8 Oct 2026" [ref=e229]
+      - cell "Settled" [ref=e230]
+    - row
+      - cell "CH-2026-0060" [ref=e231]
+      - cell "SF Sana Farooq Class 1-B" [ref=e232]
+        - StaticText "SF"
+        - StaticText "Sana Farooq"
+        - StaticText "Class 1-B"
+      - cell "Oct 2026" [ref=e233]
+      - cell "Rs. 1,800" [ref=e234]
+      - cell "Paid" [ref=e235]
+      - cell "14 Oct 2026" [ref=e236]
+      - cell "Settled" [ref=e237]
+    - row
+      - cell "CH-2026-0066" [ref=e238]
+      - cell "FM Fatima Mirza Class 1-A" [ref=e239]
+        - StaticText "FM"
+        - StaticText "Fatima Mirza"
+        - StaticText "Class 1-A"
+      - cell "Oct 2026" [ref=e240]
+      - cell "Rs. 1,800" [ref=e241]
+      - cell "Pending" [ref=e242]
+      - cell "—" [ref=e243]
+      - cell "Collect" [ref=e244]
+        - button "Collect" [ref=e263]
+    - row
+      - cell "CH-2026-0072" [ref=e245]
+      - cell "IA Ibrahim Aslam Class 1-B" [ref=e246]
+        - StaticText "IA"
+        - StaticText "Ibrahim Aslam"
+        - StaticText "Class 1-B"
+      - cell "Oct 2026" [ref=e247]
+      - cell "Rs. 1,800" [ref=e248]
+      - cell "Paid" [ref=e249]
+      - cell "11 Oct 2026" [ref=e250]
+      - cell "Settled" [ref=e251]
+  - StaticText "Page 1 of 13"
+  - button "Previous" [disabled, ref=e156]
+  - button "Next" [ref=e157]

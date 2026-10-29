@@ -1,0 +1,180 @@
+- complementary
+  - image
+  - StaticText "SkoolyPro"
+  - StaticText "Iqra Model School"
+  - navigation
+    - StaticText "OVERVIEW"
+    - link "Dashboard" [ref=e264]
+      - image
+      - StaticText "Dashboard"
+    - StaticText "PEOPLE"
+    - link "Students" [ref=e265]
+      - image
+      - StaticText "Students"
+    - link "Teachers" [ref=e266]
+      - image
+      - StaticText "Teachers"
+    - link "Classes & Sections" [ref=e267]
+      - image
+      - StaticText "Classes & Sections"
+    - StaticText "ACADEMICS"
+    - link "Attendance" [ref=e268]
+      - image
+      - StaticText "Attendance"
+    - link "Exams & Results" [ref=e269]
+      - image
+      - StaticText "Exams & Results"
+    - link "Timetable" [ref=e270]
+      - image
+      - StaticText "Timetable"
+    - StaticText "OPERATIONS"
+    - link "Fee Management" [ref=e271]
+      - image
+      - StaticText "Fee Management"
+    - link "Notice Board" [ref=e272]
+      - image
+      - StaticText "Notice Board"
+    - link "Expenses" [ref=e273]
+      - image
+      - StaticText "Expenses"
+    - StaticText "SYSTEM"
+    - link "Settings" [ref=e274]
+      - image
+      - StaticText "Settings"
+  - generic
+    - StaticText "HTML Edition — static demo"
+    - LineBreak "\n"
+    - StaticText "Data resets on refresh"
+- main
+  - generic
+    - heading "Timetable" [level=1, ref=e275]
+    - StaticText "Weekly class schedule"
+    - StaticText "Wed, 28 Oct 2026"
+    - button "Toggle dark mode" [ref=e276]
+      - image
+    - StaticText "IM"
+  - combobox [expanded=false, ref=e277]: Class 10
+    - MenuListPopup
+      - option "Class 1" [ref=e278]
+      - option "Class 2" [ref=e279]
+      - option "Class 3" [ref=e280]
+      - option "Class 4" [ref=e281]
+      - option "Class 5" [ref=e282]
+      - option "Class 6" [ref=e283]
+      - option "Class 7" [ref=e284]
+      - option "Class 8" [ref=e285]
+      - option "Class 9" [ref=e286]
+      - option "Class 10" [selected, ref=e287]
+  - StaticText "Room R-109 · Sections A & B"
+  - StaticText "Class Teacher: Usman Ghani"
+  - StaticText "TIME"
+  - StaticText "MON"
+  - StaticText "TUE"
+  - StaticText "WED"
+  - StaticText "THU"
+  - StaticText "FRI"
+  - StaticText "SAT"
+  - StaticText "08:00 - 08:45"
+  - StaticText "English"
+  - StaticText "Farhana · English"
+  - StaticText "Urdu"
+  - StaticText "Ahmed · Urdu"
+  - StaticText "Mathematics"
+  - StaticText "Muhammad · Mathematics"
+  - StaticText "Physics"
+  - StaticText "Rashid · Physics"
+  - StaticText "Chemistry"
+  - StaticText "Ayesha · Chemistry"
+  - StaticText "Biology"
+  - StaticText "Fizzah · Biology"
+  - StaticText "08:50 - 09:35"
+  - StaticText "Urdu"
+  - StaticText "Ahmed · Urdu"
+  - StaticText "Mathematics"
+  - StaticText "Muhammad · Mathematics"
+  - StaticText "Physics"
+  - StaticText "Rashid · Physics"
+  - StaticText "Chemistry"
+  - StaticText "Ayesha · Chemistry"
+  - StaticText "Biology"
+  - StaticText "Fizzah · Biology"
+  - StaticText "Islamiat"
+  - StaticText "Hafiza · Islamiat"
+  - StaticText "09:40 - 10:25"
+  - StaticText "Mathematics"
+  - StaticText "Muhammad · Mathematics"
+  - StaticText "Physics"
+  - StaticText "Rashid · Physics"
+  - StaticText "Chemistry"
+  - StaticText "Ayesha · Chemistry"
+  - StaticText "Biology"
+  - StaticText "Fizzah · Biology"
+  - StaticText "Islamiat"
+  - StaticText "Hafiza · Islamiat"
+  - StaticText "Pakistan Studies"
+  - StaticText "Tariq · Pakistan Studies"
+  - StaticText "10:30 - 11:15"
+  - StaticText "Physics"
+  - StaticText "Rashid · Physics"
+  - StaticText "Chemistry"
+  - StaticText "Ayesha · Chemistry"
+  - StaticText "Biology"
+  - StaticText "Fizzah · Biology"
+  - StaticText "Islamiat"
+  - StaticText "Hafiza · Islamiat"
+  - StaticText "Pakistan Studies"
+  - StaticText "Tariq · Pakistan Studies"
+  - StaticText "English"
+  - StaticText "Farhana · English"
+  - StaticText "11:45 - 12:30"
+  - StaticText "Chemistry"
+  - StaticText "Ayesha · Chemistry"
+  - StaticText "Biology"
+  - StaticText "Fizzah · Biology"
+  - StaticText "Islamiat"
+  - StaticText "Hafiza · Islamiat"
+  - StaticText "Pakistan Studies"
+  - StaticText "Tariq · Pakistan Studies"
+  - StaticText "English"
+  - StaticText "Farhana · English"
+  - StaticText "Urdu"
+  - StaticText "Ahmed · Urdu"
+  - StaticText "12:35 - 13:20"
+  - StaticText "Biology"
+  - StaticText "Fizzah · Biology"
+  - StaticText "Islamiat"
+  - StaticText "Hafiza · Islamiat"
+  - StaticText "Pakistan Studies"
+  - StaticText "Tariq · Pakistan Studies"
+  - StaticText "English"
+  - StaticText "Farhana · English"
+  - StaticText "Urdu"
+  - StaticText "Ahmed · Urdu"
+  - StaticText "Mathematics"
+  - StaticText "Muhammad · Mathematics"
+  - StaticText "13:25 - 14:10"
+  - StaticText "Islamiat"
+  - StaticText "Hafiza · Islamiat"
+  - StaticText "Pakistan Studies"
+  - StaticText "Tariq · Pakistan Studies"
+  - StaticText "English"
+  - StaticText "Farhana · English"
+  - StaticText "Urdu"
+  - StaticText "Ahmed · Urdu"
+  - StaticText "Mathematics"
+  - StaticText "Muhammad · Mathematics"
+  - StaticText "Physics"
+  - StaticText "Rashid · Physics"
+  - StaticText "14:15 - 15:00"
+  - StaticText "Pakistan Studies"
+  - StaticText "Tariq · Pakistan Studies"
+  - StaticText "English"
+  - StaticText "Farhana · English"
+  - StaticText "Urdu"
+  - StaticText "Ahmed · Urdu"
+  - StaticText "Mathematics"
+  - StaticText "Muhammad · Mathematics"
+  - StaticText "Physics"
+  - StaticText "Rashid · Physics"
+  - StaticText "Chemistry"
+  - StaticText "Ayesha · Chemistry"
