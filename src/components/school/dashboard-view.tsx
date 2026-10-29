@@ -7,6 +7,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -23,11 +24,12 @@ import {
   Wallet,
   HandCoins,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useSchoolStore } from "@/lib/store";
+import { cn } from "@/lib/utils";
 import { avatarColor, challanDue, challanPaid, currentMonth, formatRs, initials, todayISO } from "@/lib/helpers";
 import type { ViewKey } from "@/lib/types";
 
@@ -37,15 +39,18 @@ function StatCard({
   sub,
   icon: Icon,
   tone,
+  accent,
 }: {
   title: string;
   value: string;
   sub: string;
   icon: React.ElementType;
   tone: string;
+  accent: string;
 }) {
   return (
-    <Card className="py-5">
+    <Card className="card-hover relative overflow-hidden py-5">
+      <span aria-hidden className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${accent}`} />
       <CardContent className="flex items-start justify-between px-5">
         <div className="min-w-0">
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
@@ -55,7 +60,7 @@ function StatCard({
             {sub}
           </p>
         </div>
-        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${tone}`}>
+        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br shadow-sm ${tone}`}>
           <Icon className="h-5 w-5" aria-hidden />
         </div>
       </CardContent>
@@ -138,8 +143,8 @@ export default function DashboardView({ onNavigate }: { onNavigate: (v: ViewKey)
   return (
     <div className="space-y-6">
       {/* Welcome banner */}
-      <div className="rounded-xl border bg-gradient-to-r from-primary to-teal-600 p-5 text-primary-foreground shadow-sm sm:p-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="hero-banner rounded-xl border border-primary/20 p-5 text-primary-foreground shadow-md sm:p-6">
+        <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-bold sm:text-xl">Assalam-o-Alaikum, Admin!</h2>
             <p className="mt-1 text-sm text-primary-foreground/85">
@@ -152,7 +157,7 @@ export default function DashboardView({ onNavigate }: { onNavigate: (v: ViewKey)
               variant="secondary"
               size="sm"
               onClick={() => onNavigate("attendance")}
-              className="gap-1.5 bg-white/15 text-white hover:bg-white/25 hover:text-white"
+              className="gap-1.5 bg-white/15 text-white shadow-sm backdrop-blur-sm hover:bg-white/25 hover:text-white"
             >
               <ClipboardCheck className="h-4 w-4" /> Mark Attendance
             </Button>
@@ -160,7 +165,7 @@ export default function DashboardView({ onNavigate }: { onNavigate: (v: ViewKey)
               variant="secondary"
               size="sm"
               onClick={() => onNavigate("fees")}
-              className="gap-1.5 bg-white/15 text-white hover:bg-white/25 hover:text-white"
+              className="gap-1.5 bg-white/15 text-white shadow-sm backdrop-blur-sm hover:bg-white/25 hover:text-white"
             >
               <Wallet className="h-4 w-4" /> Collect Fees
             </Button>
@@ -175,36 +180,41 @@ export default function DashboardView({ onNavigate }: { onNavigate: (v: ViewKey)
           value={String(stats.totalStudents)}
           sub={`${students.filter((s) => s.status === "Inactive").length} inactive`}
           icon={Users}
-          tone="bg-primary/10 text-primary"
+          tone="from-primary/15 to-teal-500/10 text-primary"
+          accent="from-primary to-teal-400"
         />
         <StatCard
           title="Teaching Staff"
           value={String(stats.totalTeachers)}
           sub={`${teachers.filter((t) => t.status === "On Leave").length} on leave`}
           icon={UsersRound}
-          tone="bg-amber-500/10 text-amber-600"
+          tone="from-amber-500/15 to-orange-500/10 text-amber-600"
+          accent="from-amber-400 to-orange-500"
         />
         <StatCard
           title="Fees Collected (This Month)"
           value={formatRs(stats.collected)}
           sub={`${formatRs(stats.outstanding)} outstanding`}
           icon={Wallet}
-          tone="bg-emerald-500/10 text-emerald-600"
+          tone="from-emerald-500/15 to-teal-500/10 text-emerald-600"
+          accent="from-emerald-400 to-teal-500"
         />
         <StatCard
           title="Attendance Today"
           value={`${stats.attPct}%`}
           sub={`${stats.presentToday} present of ${stats.markedToday} marked`}
           icon={ClipboardCheck}
-          tone="bg-cyan-500/10 text-cyan-600"
+          tone="from-cyan-500/15 to-teal-500/10 text-cyan-600"
+          accent="from-cyan-400 to-teal-500"
         />
       </div>
 
       {/* Charts row */}
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
+        <Card className="card-hover">
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Attendance Rate — Last 7 Days</CardTitle>
+            <CardDescription>Share of present &amp; late students per school day</CardDescription>
           </CardHeader>
           <CardContent className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -220,17 +230,18 @@ export default function DashboardView({ onNavigate }: { onNavigate: (v: ViewKey)
                 <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} unit="%" />
                 <Tooltip
                   formatter={(v: number) => [`${v}%`, "Attendance"]}
-                  contentStyle={{ borderRadius: 10, border: "1px solid #d9e2de", fontSize: 12 }}
+                  contentStyle={{ borderRadius: 10, border: "1px solid var(--border)", background: "var(--card)", color: "var(--card-foreground)", fontSize: 12 }}
                 />
-                <Area type="monotone" dataKey="rate" stroke="#0d9488" strokeWidth={2.5} fill="url(#attGrad)" />
+                <Area type="monotone" dataKey="rate" stroke="#0d9488" strokeWidth={2.5} fill="url(#attGrad)" activeDot={{ r: 4 }} />
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="card-hover">
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Fee Collection by Month</CardTitle>
+            <CardDescription>Collected vs pending amounts per challan month</CardDescription>
           </CardHeader>
           <CardContent className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -244,8 +255,15 @@ export default function DashboardView({ onNavigate }: { onNavigate: (v: ViewKey)
                   tickFormatter={(v: number) => `${Math.round(v / 1000)}k`}
                 />
                 <Tooltip
+                  cursor={{ fill: "var(--muted)", opacity: 0.4 }}
                   formatter={(v: number, name: string) => [formatRs(v), name === "collected" ? "Collected" : "Pending"]}
-                  contentStyle={{ borderRadius: 10, border: "1px solid #d9e2de", fontSize: 12 }}
+                  contentStyle={{ borderRadius: 10, border: "1px solid var(--border)", background: "var(--card)", color: "var(--card-foreground)", fontSize: 12 }}
+                />
+                <Legend
+                  iconType="circle"
+                  iconSize={8}
+                  wrapperStyle={{ fontSize: 12 }}
+                  formatter={(v) => (v === "collected" ? "Collected" : "Pending")}
                 />
                 <Bar dataKey="collected" fill="#0d9488" radius={[5, 5, 0, 0]} maxBarSize={38} />
                 <Bar dataKey="pending" fill="#f59e0b" radius={[5, 5, 0, 0]} maxBarSize={38} />
@@ -267,10 +285,26 @@ export default function DashboardView({ onNavigate }: { onNavigate: (v: ViewKey)
             </CardTitle>
           </CardHeader>
           <CardContent className="custom-scrollbar max-h-80 space-y-3.5 overflow-y-auto pr-2">
-            {classStrength.map((c) => (
+            {classStrength.map((c, i) => (
               <div key={c.name}>
                 <div className="mb-1 flex items-center justify-between text-sm">
-                  <span className="font-medium">{c.name}</span>
+                  <span className="flex items-center gap-2">
+                    <span
+                      className={cn(
+                        "flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold tabular-nums",
+                        i === 0
+                          ? "bg-amber-500/15 text-amber-600"
+                          : i === 1
+                            ? "bg-slate-500/15 text-slate-600"
+                            : i === 2
+                              ? "bg-orange-500/15 text-orange-600"
+                              : "bg-muted text-muted-foreground"
+                      )}
+                    >
+                      {i + 1}
+                    </span>
+                    <span className="font-medium">{c.name}</span>
+                  </span>
                   <span className="tabular-nums text-muted-foreground">{c.students} students</span>
                 </div>
                 <Progress value={(c.students / maxStrength) * 100} className="h-2" />
@@ -294,7 +328,14 @@ export default function DashboardView({ onNavigate }: { onNavigate: (v: ViewKey)
             {notices.slice(0, 5).map((n) => (
               <div
                 key={n.id}
-                className="flex items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-accent/40"
+                className={cn(
+                  "flex items-start gap-3 rounded-lg border border-l-4 p-3 transition-colors hover:bg-accent/40",
+                  n.priority === "Urgent"
+                    ? "border-l-red-500"
+                    : n.priority === "Important"
+                      ? "border-l-amber-500"
+                      : "border-l-border"
+                )}
               >
                 <div
                   className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white ${avatarColor(n.title)}`}

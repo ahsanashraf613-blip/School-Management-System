@@ -118,7 +118,117 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
+  html {
+    scroll-behavior: smooth;
+  }
+  ::selection {
+    background: oklch(0.62 0.14 165 / 0.25);
+  }
+}
+
+/* ── View transition: content fades + rises when switching modules ───────── */
+@keyframes view-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.view-enter {
+  animation: view-enter 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Card hover lift for interactive cards ───────────────────────────────── */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -8px oklch(0.3 0.04 170 / 0.18);
+  border-color: oklch(0.62 0.14 165 / 0.35);
+}
+
+/* ── Hero banner: layered emerald gradient with soft glow orbs ───────────── */
+.hero-banner {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 60% 90% at 85% -10%, oklch(0.75 0.15 165 / 0.5), transparent 60%),
+    radial-gradient(ellipse 45% 70% at 5% 110%, oklch(0.6 0.16 175 / 0.45), transparent 65%),
+    linear-gradient(120deg, oklch(0.5 0.13 168), oklch(0.55 0.14 172) 55%, oklch(0.47 0.12 175));
+}
+.hero-banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(oklch(1 0 0 / 0.14) 1px, transparent 1px);
+  background-size: 22px 22px;
+  mask-image: linear-gradient(to bottom, transparent, black 40%, transparent);
+  pointer-events: none;
+}
+
+/* ── Sidebar: deep vertical gradient ─────────────────────────────────────── */
+.sidebar-gradient {
+  background: linear-gradient(180deg, oklch(0.26 0.04 172) 0%, oklch(0.23 0.035 175) 45%, oklch(0.2 0.03 176) 100%);
+}
+.dark .sidebar-gradient {
+  background: linear-gradient(180deg, oklch(0.22 0.03 174) 0%, oklch(0.19 0.026 176) 50%, oklch(0.16 0.022 177) 100%);
+}
+
+/* ── Shimmer for skeleton loaders ────────────────────────────────────────── */
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    oklch(0.85 0.02 165 / 0.35) 25%,
+    oklch(0.92 0.015 165 / 0.6) 50%,
+    oklch(0.85 0.02 165 / 0.35) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+.dark .shimmer {
+  background: linear-gradient(
+    90deg,
+    oklch(0.3 0.03 175 / 0.5) 25%,
+    oklch(0.38 0.035 173 / 0.7) 50%,
+    oklch(0.3 0.03 175 / 0.5) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+/* ── Pulsing dot for live/urgent indicators ──────────────────────────────── */
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 oklch(0.62 0.14 165 / 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 6px oklch(0.62 0.14 165 / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 oklch(0.62 0.14 165 / 0);
+  }
+}
+.pulse-dot {
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+/* ── Smooth row transitions in data tables ───────────────────────────────── */
+[data-slot="table-row"] {
+  transition: background-color 0.15s ease;
 }
 
 /* Custom scrollbar for long lists */

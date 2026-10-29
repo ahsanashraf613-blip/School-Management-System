@@ -96,3 +96,20 @@ Work Log:
 
 Stage Summary:
 - School now spans Class 1–10 with subject-appropriate faculty; all modules (fees, attendance, marks, promote) automatically cover the new classes since they derive from the class list
+
+---
+Task ID: 5
+Agent: Main agent (Z.ai)
+Task: UI polish pass across the app shell and dashboard
+
+Work Log:
+- globals.css: added design-system utilities — .view-enter (fade+rise module transition), .card-hover (lift+glow), .hero-banner (layered emerald gradient with dot-grid mask), .sidebar-gradient (deep vertical gradient, light+dark), .shimmer (skeleton loading), .pulse-dot (live/urgent indicator), brand ::selection color, smooth scroll, table row transitions
+- page.tsx shell: nav grouped into OVERVIEW / PEOPLE / ACADEMICS / OPERATIONS / SYSTEM with uppercase section labels; active item now has emerald left accent bar + gradient glow shadow + hover micro-shift; sidebar uses gradient with pulsing "Backend Connected" dot; brand logo gets gradient + ring
+- Added Notifications bell (Popover) in topbar: overdue challans, pending count, attendance-not-marked-today, urgent/important notices — each row navigates to its module; red pulse dot when alerts exist
+- View switching animated via key={view} wrapper with .view-enter; LoadingSplash upgraded with shimmer skeleton bars + pulsing logo
+- dashboard-view: StatCards rebuilt (gradient top accent strip, gradient icon tile, hover lift); welcome banner uses .hero-banner texture with backdrop-blur buttons; charts get CardDescription subtitles + theme-adaptive tooltips + Legend on fee chart + activeDot; Class Strength list gets gold/silver/bronze rank chips; notice rows get priority color-coded left borders (red/amber/neutral)
+- Fixed fee stat value wrapping (kept text-2xl); lint clean; browser-verified desktop light + dark, bell popover content, mobile 390x844 layout + drawer nav groups; zero page errors
+- Screenshots: scripts/verify-ui-*.png
+
+Stage Summary:
+- UI refresh shipped: grouped navigation, notification center, animated transitions, gradient stat cards, hero banner, ranked class strength — all modules, light/dark, desktop/mobile
